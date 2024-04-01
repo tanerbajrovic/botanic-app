@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
@@ -33,39 +34,55 @@
 
         <TextView
             android:id="@+id/nazivItem"
+            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:fontFamily="sans-serif-black"
             android:text="Test"
             android:textAllCaps="true"
-        />
+            />
 
         <TextView
-            android:id="@+id/porodiceItem"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="Test"
-            android:textStyle="italic"
-        />
-
-        <TextView
-            android:id="@+id/klimatskiTipItem"
+            android:id="@+id/upozorenjeItem"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:text="Test"
             />
 
-        <TextView
-            android:id="@+id/zemljisniTipItem"
+        <LinearLayout
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:text="Test"
-        />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/korist1Item"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Test"
+                />
+
+            <TextView
+                android:id="@+id/korist2Item"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Test"
+                />
+
+            <TextView
+                android:id="@+id/korist3Item"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Test"
+                />
+
+        </LinearLayout>
 
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
