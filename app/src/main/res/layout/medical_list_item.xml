@@ -34,40 +34,41 @@
 
         <TextView
             android:id="@+id/nazivItem"
-            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:fontFamily="sans-serif-black"
             android:text="Test"
             android:textAllCaps="true"
-            />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/upozorenjeItem"
-            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Test"
-            />
+            android:textSize="12sp"
+        />
 
         <LinearLayout
             android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/korist1Item"
                 android:layout_weight="1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:text="Test"
-                />
+            />
 
             <TextView
                 android:id="@+id/korist2Item"
                 android:layout_weight="1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:text="Test"
                 />
@@ -75,7 +76,7 @@
             <TextView
                 android:id="@+id/korist3Item"
                 android:layout_weight="1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:text="Test"
                 />
