@@ -16,8 +16,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ArrayAdapter<String>
     private val modes: Array<String> = arrayOf("Medical", "Culinary", "Botanic")
     private var listOfPlants: List<Biljka> = getPlants()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var spinnerState: SpinnerState = SpinnerState.CULINARY
         setContentView(R.layout.activity_main)
         val resetButton: Button = findViewById(R.id.resetBtn)
         plants = findViewById(R.id.biljkeRV)
@@ -26,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             LinearLayoutManager.VERTICAL,
             false
         )
-        plantsAdapter = PlantListAdapter(listOf())
+        plantsAdapter = PlantListAdapter(listOf(), spinnerState)
         plants.adapter = plantsAdapter
         plantsAdapter.updatePlants(listOfPlants)
         spinner = findViewById(R.id.modSpinner)
@@ -35,7 +37,8 @@ class MainActivity : AppCompatActivity() {
         spinner.adapter = adapter
         resetButton.setOnClickListener {
             spinner.setSelection(0)
-            // Code for RecyclerView adapter
+            spinnerState = SpinnerState.MEDICAL
+            plantsAdapter.changeSpinnerState(spinnerState)
         }
     }
 
