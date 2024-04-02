@@ -32,11 +32,14 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     class CulinaryPlantViewHolder(itemView: View) : PlantViewHolder(itemView) {
         private val plantTasteProfile: TextView = itemView.findViewById(R.id.profilOkusa)
+//        private val plantDishes: List<TextView> = listOf(itemView.findViewById(R.id.jelo1Item),
+//            itemView.findViewById(R.id.jelo2Item), itemView.findViewById(R.id.jelo3Item))
         private val plantDishOne: TextView = itemView.findViewById(R.id.jelo1Item)
         private val plantDishTwo: TextView = itemView.findViewById(R.id.jelo2Item)
         private val plantDishThree: TextView = itemView.findViewById(R.id.jelo3Item)
 
         override fun bind(plant: Biljka) {
+            super.bind(plant)
             plantTasteProfile.text = plant.profilOkusa.toString()
             if (plant.jela.size >= 3) { // There's a better way to do this, probably.
                 plantDishOne.text = plant.jela[0]
@@ -60,6 +63,7 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         private val plantRemedyThree: TextView = itemView.findViewById(R.id.korist3Item)
 
         override fun bind(plant: Biljka) {
+            super.bind(plant)
             plantWarning.text = plant.medicinskoUpozorenje
             if (plant.medicinskeKoristi.size >= 3) { // There's a better way to do this, probably.
                 plantRemedyOne.text = plant.medicinskeKoristi[0].toString()
