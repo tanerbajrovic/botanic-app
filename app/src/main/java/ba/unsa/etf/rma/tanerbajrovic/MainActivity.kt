@@ -13,13 +13,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var plants: RecyclerView
     private lateinit var plantsAdapter: PlantListAdapter
     private lateinit var spinner: Spinner
-    private lateinit var adapter: ArrayAdapter<String>
+    private lateinit var spinnerAdapter: ArrayAdapter<String>
     private val modes: Array<String> = arrayOf("Medical", "Culinary", "Botanic")
     private var listOfPlants: List<Biljka> = getPlants()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var spinnerState: SpinnerState = SpinnerState.CULINARY
+        var spinnerState: SpinnerState = SpinnerState.BOTANIC
         setContentView(R.layout.activity_main)
         val resetButton: Button = findViewById(R.id.resetBtn)
         plants = findViewById(R.id.biljkeRV)
@@ -32,18 +32,15 @@ class MainActivity : AppCompatActivity() {
         plants.adapter = plantsAdapter
         plantsAdapter.updatePlants(listOfPlants)
         spinner = findViewById(R.id.modSpinner)
-        adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, modes)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
+        spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, modes)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = spinnerAdapter
         resetButton.setOnClickListener {
             spinner.setSelection(0)
             spinnerState = SpinnerState.MEDICAL
             plantsAdapter.changeSpinnerState(spinnerState)
         }
+
     }
 
 }
-
-// Clicking a list item changes RecyclerView
-// -> AdapterView for Spinner
-// -> PlantListAdapter
