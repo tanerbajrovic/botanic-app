@@ -16,12 +16,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var plantsAdapter: PlantListAdapter
     private lateinit var spinner: Spinner
     private lateinit var spinnerAdapter: ArrayAdapter<String>
-    private val states: Array<String> = arrayOf("Medical", "Culinary", "Botanic")
+    private val states: Array<String> = arrayOf("Medicinski", "Kuharski", "Botanički")
     private var listOfPlants: List<Biljka> = getPlants()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var spinnerState: SpinnerState = SpinnerState.BOTANIC
+        var spinnerState: SpinnerState = SpinnerState.MEDICAL
         setContentView(R.layout.activity_main)
         val resetButton: Button = findViewById(R.id.resetBtn)
         plants = findViewById(R.id.biljkeRV)

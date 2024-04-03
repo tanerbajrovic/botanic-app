@@ -55,11 +55,12 @@ class PlantListAdapter(
     }
 
     fun changeSpinnerState(newState: SpinnerState) {
+        if (newState == spinnerState)
+            return
         spinnerState = newState
         notifyDataSetChanged()
     }
 
-    // What's a more efficient way of doing this?
     fun updatePlants(plants: List<Biljka>) {
         this.plants = plants
         filteredPlants = plants.toList()

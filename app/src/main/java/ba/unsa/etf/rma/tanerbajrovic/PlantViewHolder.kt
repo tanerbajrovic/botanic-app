@@ -31,7 +31,7 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     }
 
     class CulinaryPlantViewHolder(itemView: View) : PlantViewHolder(itemView) {
-        private val plantTasteProfile: TextView = itemView.findViewById(R.id.profilOkusa)
+        private val plantTasteProfile: TextView = itemView.findViewById(R.id.profilOkusaItem)
         private val plantDishOne: TextView = itemView.findViewById(R.id.jelo1Item)
         private val plantDishTwo: TextView = itemView.findViewById(R.id.jelo2Item)
         private val plantDishThree: TextView = itemView.findViewById(R.id.jelo3Item)
