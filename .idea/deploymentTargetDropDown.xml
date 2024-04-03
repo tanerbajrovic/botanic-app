@@ -2,6 +2,9 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="TestS1">
+        <State />
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -15,8 +18,11 @@
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-04-02T15:17:14.247425Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-04-03T19:00:04.371064200Z" />
         </State>
+      </entry>
+      <entry key="svakiModImaIspravneIdeve()">
+        <State />
       </entry>
     </value>
   </component>
