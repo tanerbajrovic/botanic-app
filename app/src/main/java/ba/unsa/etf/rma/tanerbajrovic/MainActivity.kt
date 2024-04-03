@@ -30,7 +30,9 @@ class MainActivity : AppCompatActivity() {
             LinearLayoutManager.VERTICAL,
             false
         )
-        plantsAdapter = PlantListAdapter(listOf(), spinnerState)
+        plantsAdapter = PlantListAdapter(listOf(), spinnerState) {
+            item -> plantsAdapter.filterPlants(item)
+        }
         plants.adapter = plantsAdapter
         plantsAdapter.updatePlants(listOfPlants)
         spinner = findViewById(R.id.modSpinner)
@@ -56,7 +58,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 plantsAdapter.changeSpinnerState(spinnerState)
             }
-
             override fun onNothingSelected(p0: AdapterView<*>?) {
                 spinner.setSelection(0)
                 spinnerState = SpinnerState.MEDICAL
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
         resetButton.setOnClickListener {
             spinner.setSelection(0)
+            plantsAdapter.resetPlants()
         }
     }
 

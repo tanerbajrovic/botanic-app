@@ -1,12 +1,18 @@
 package ba.unsa.etf.rma.tanerbajrovic
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class PlantListAdapter(private var plants: List<Biljka>, private var spinnerState: SpinnerState)
+class PlantListAdapter(
+    private var plants: List<Biljka>,
+    private var spinnerState: SpinnerState,
+    private val listener: (Biljka) -> Unit)
     : RecyclerView.Adapter<PlantViewHolder>() {
+
+    private var filteredPlants: List<Biljka> = plants.toList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlantViewHolder {
         lateinit var view: View
@@ -31,17 +37,16 @@ class PlantListAdapter(private var plants: List<Biljka>, private var spinnerStat
     }
 
     override fun getItemCount(): Int {
-        return plants.size
+        return filteredPlants.size
     }
 
-    // ! Add better error-handling when remedies and dishes are empty.
     override fun onBindViewHolder(holder: PlantViewHolder, position: Int) {
-        holder.plantName.text = plants[position].naziv
-        holder.bind(plants[position])
+        val item: Biljka = filteredPlants[position]
+        holder.bind(item)
+        holder.itemView.setOnClickListener { listener(item) }
     }
 
     override fun getItemViewType(position: Int): Int {
-//        return super.getItemViewType(position)
         return when (spinnerState) {
             SpinnerState.MEDICAL -> R.layout.medical_list_item
             SpinnerState.BOTANIC -> R.layout.botanic_list_item
@@ -57,11 +62,38 @@ class PlantListAdapter(private var plants: List<Biljka>, private var spinnerStat
     // What's a more efficient way of doing this?
     fun updatePlants(plants: List<Biljka>) {
         this.plants = plants
+        filteredPlants = plants.toList()
         notifyDataSetChanged()
     }
 
-//    fun resetPlants() {
-//
-//    }
+    fun filterPlants(plant: Biljka) {
+        when (spinnerState) {
+            SpinnerState.MEDICAL -> {
+                filteredPlants = filteredPlants.filter {
+                    it.medicinskeKoristi.intersect(plant.medicinskeKoristi.toSet()).isNotEmpty()
+                }
+            }
+            SpinnerState.BOTANIC -> {
+                filteredPlants = filteredPlants.filter {
+                    it.profilOkusa == plant.profilOkusa || it.jela.intersect(plant.jela.toSet()).isNotEmpty()
+                }
+            }
+            SpinnerState.CULINARY -> {
+                filteredPlants = filteredPlants.filter {
+                    it.porodica == plant.porodica
+                            &&
+                    it.klimatskiTipovi.intersect(plant.klimatskiTipovi.toSet()).isNotEmpty()
+                            &&
+                    it.zemljisniTipovi.intersect(plant.zemljisniTipovi.toSet()).isNotEmpty()
+                }
+            }
+        }
+        notifyDataSetChanged()
+    }
+
+    fun resetPlants() {
+        filteredPlants = plants.toList()
+        notifyDataSetChanged()
+    }
 
 }
