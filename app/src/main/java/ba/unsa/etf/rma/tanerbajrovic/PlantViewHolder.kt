@@ -24,9 +24,9 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             super.bind(plant)
             plantFamily.text = plant.porodica
             if (plant.zemljisniTipovi.isNotEmpty())
-                plantSoil.text = plant.zemljisniTipovi[0].toString()
+                plantSoil.text = plant.zemljisniTipovi[0].naziv
             if (plant.klimatskiTipovi.isNotEmpty())
-                plantClimate.text = plant.klimatskiTipovi[0].toString()
+                plantClimate.text = plant.klimatskiTipovi[0].opis
         }
     }
 
@@ -64,16 +64,16 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             super.bind(plant)
             plantWarning.text = plant.medicinskoUpozorenje
             if (plant.medicinskeKoristi.size >= 3) { // There's a better way to do this, probably.
-                plantRemedyOne.text = plant.medicinskeKoristi[0].toString()
-                plantRemedyTwo.text = plant.medicinskeKoristi[1].toString()
-                plantRemedyThree.text = plant.medicinskeKoristi[2].toString()
+                plantRemedyOne.text = plant.medicinskeKoristi[0].opis
+                plantRemedyTwo.text = plant.medicinskeKoristi[1].opis
+                plantRemedyThree.text = plant.medicinskeKoristi[2].opis
             }
             else if (plant.jela.size == 2) {
-                plantRemedyOne.text = plant.medicinskeKoristi[0].toString()
-                plantRemedyTwo.text = plant.medicinskeKoristi[1].toString()
+                plantRemedyOne.text = plant.medicinskeKoristi[0].opis
+                plantRemedyTwo.text = plant.medicinskeKoristi[1].opis
             }
             else if (plant.jela.size == 1) {
-                plantRemedyOne.text = plant.medicinskeKoristi[0].toString()
+                plantRemedyOne.text = plant.medicinskeKoristi[0].opis
             }
         }
     }
