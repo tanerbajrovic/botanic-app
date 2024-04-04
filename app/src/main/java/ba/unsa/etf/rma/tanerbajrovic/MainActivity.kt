@@ -30,9 +30,7 @@ class MainActivity : AppCompatActivity() {
             LinearLayoutManager.VERTICAL,
             false
         )
-        plantsAdapter = PlantListAdapter(listOf(), spinnerState) {
-            item -> plantsAdapter.filterPlants(item)
-        }
+        plantsAdapter = PlantListAdapter(listOf(), spinnerState)
         plants.adapter = plantsAdapter
         plantsAdapter.updatePlants(listOfPlants)
         spinner = findViewById(R.id.modSpinner)

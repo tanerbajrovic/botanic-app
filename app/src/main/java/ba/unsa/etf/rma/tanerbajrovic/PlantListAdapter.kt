@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class PlantListAdapter(
     private var plants: List<Biljka>,
-    private var spinnerState: SpinnerState,
-    private val listener: (Biljka) -> Unit)
+    private var spinnerState: SpinnerState)
     : RecyclerView.Adapter<PlantViewHolder>() {
 
     private var filteredPlants: List<Biljka> = plants.toList()
@@ -43,7 +42,7 @@ class PlantListAdapter(
     override fun onBindViewHolder(holder: PlantViewHolder, position: Int) {
         val item: Biljka = filteredPlants[position]
         holder.bind(item)
-        holder.itemView.setOnClickListener { listener(item) }
+        holder.itemView.setOnClickListener { filterPlants(item) }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -67,7 +66,7 @@ class PlantListAdapter(
         notifyDataSetChanged()
     }
 
-    fun filterPlants(plant: Biljka) {
+    private fun filterPlants(plant: Biljka) {
         when (spinnerState) {
             SpinnerState.MEDICAL -> {
                 filteredPlants = filteredPlants.filter {
