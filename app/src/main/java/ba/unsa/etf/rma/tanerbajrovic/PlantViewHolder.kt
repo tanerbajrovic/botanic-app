@@ -38,7 +38,7 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
         override fun bind(plant: Biljka) {
             super.bind(plant)
-            plantTasteProfile.text = plant.profilOkusa.toString()
+            plantTasteProfile.text = plant.profilOkusa.opis
             if (plant.jela.size >= 3) { // There's a better way to do this, probably.
                 plantDishOne.text = plant.jela[0]
                 plantDishTwo.text = plant.jela[1]
