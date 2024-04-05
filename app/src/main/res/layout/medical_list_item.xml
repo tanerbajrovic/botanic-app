@@ -3,13 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="110dp">
 
     <ImageView
         android:id="@+id/slikaItem"
         android:layout_width="100dp"
         android:layout_height="100dp"
+        android:scaleType="centerCrop"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
@@ -17,7 +18,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.005"
-        app:srcCompat="@drawable/default_tree_background" />
+        app:srcCompat="@drawable/default_tree_background"
+    />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -30,27 +32,30 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_bias="0.005"
-        app:layout_constraintStart_toEndOf="@+id/slikaItem">
+        app:layout_constraintStart_toEndOf="@+id/slikaItem"
+    >
 
         <TextView
             android:id="@+id/nazivItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="1.2"
             android:fontFamily="sans-serif-black"
             android:textAllCaps="true"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+        />
 
         <TextView
             android:id="@+id/upozorenjeItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="12sp"
+            android:layout_weight="1.5"
+            android:justificationMode="inter_word"
+            android:textSize="11sp"
         />
 
         <LinearLayout
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -60,6 +65,7 @@
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:textSize="11sp"
             />
 
             <TextView
@@ -67,13 +73,15 @@
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                />
+                android:textSize="11sp"
+            />
 
             <TextView
                 android:id="@+id/korist3Item"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:textSize="11sp"
             />
 
         </LinearLayout>
