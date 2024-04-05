@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    val plantImage: ImageView = itemView.findViewById(R.id.slikaItem)
-    val plantName: TextView = itemView.findViewById(R.id.nazivItem)
+    private val plantImage: ImageView = itemView.findViewById(R.id.slikaItem)
+    private val plantName: TextView = itemView.findViewById(R.id.nazivItem)
 
     open fun bind(plant: Biljka) {
         plantImage.setImageResource(R.mipmap.default_tree)
@@ -39,17 +39,13 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         override fun bind(plant: Biljka) {
             super.bind(plant)
             plantTasteProfile.text = plant.profilOkusa.opis
-            if (plant.jela.size >= 3) { // There's a better way to do this, probably.
-                plantDishOne.text = plant.jela[0]
-                plantDishTwo.text = plant.jela[1]
-                plantDishThree.text = plant.jela[2]
-            }
-            else if (plant.jela.size == 2) {
-                plantDishOne.text = plant.jela[0]
-                plantDishTwo.text = plant.jela[1]
-            }
-            else if (plant.jela.size == 1) {
-                plantDishOne.text = plant.jela[0]
+            // Display at most three dishes (or display nothing when empty)
+            for (i in 0 until minOf(plant.jela.size, 3)) {
+                when (i) {
+                    1 -> plantDishOne.text = plant.jela[0]
+                    2 -> plantDishTwo.text = plant.jela[1]
+                    3 -> plantDishThree.text = plant.jela[2]
+                }
             }
         }
     }
@@ -63,17 +59,12 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         override fun bind(plant: Biljka) {
             super.bind(plant)
             plantWarning.text = plant.medicinskoUpozorenje
-            if (plant.medicinskeKoristi.size >= 3) { // There's a better way to do this, probably.
-                plantRemedyOne.text = plant.medicinskeKoristi[0].opis
-                plantRemedyTwo.text = plant.medicinskeKoristi[1].opis
-                plantRemedyThree.text = plant.medicinskeKoristi[2].opis
-            }
-            else if (plant.jela.size == 2) {
-                plantRemedyOne.text = plant.medicinskeKoristi[0].opis
-                plantRemedyTwo.text = plant.medicinskeKoristi[1].opis
-            }
-            else if (plant.jela.size == 1) {
-                plantRemedyOne.text = plant.medicinskeKoristi[0].opis
+            for (i in 0 until minOf(plant.medicinskeKoristi.size, 3)) {
+                when (i) {
+                    1 -> plantRemedyOne.text = plant.medicinskeKoristi[0].opis
+                    2 -> plantRemedyTwo.text = plant.medicinskeKoristi[1].opis
+                    3 -> plantRemedyThree.text = plant.medicinskeKoristi[2].opis
+                }
             }
         }
     }

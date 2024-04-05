@@ -16,13 +16,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var plantsAdapter: PlantListAdapter
     private lateinit var spinner: Spinner
     private lateinit var spinnerAdapter: ArrayAdapter<String>
-    private val states: Array<String> = arrayOf("Medicinski", "Kuharski", "Botanički")
+    private val states: Array<String> = arrayOf(
+        SpinnerState.MEDICAL.description,
+        SpinnerState.BOTANIC.description,
+        SpinnerState.CULINARY.description)
     private var listOfPlants: List<Biljka> = getPlants()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var spinnerState: SpinnerState = SpinnerState.MEDICAL
         setContentView(R.layout.activity_main)
+        var spinnerState: SpinnerState = SpinnerState.MEDICAL
         val resetButton: Button = findViewById(R.id.resetBtn)
         plants = findViewById(R.id.biljkeRV)
         plants.layoutManager = LinearLayoutManager(
@@ -41,13 +44,13 @@ class MainActivity : AppCompatActivity() {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val newItem: String = states[p2]
                 spinnerState = when (newItem) {
-                    states[0] -> {
+                    SpinnerState.MEDICAL.description -> {
                         SpinnerState.MEDICAL
                     }
-                    states[1] -> {
+                    SpinnerState.CULINARY.description -> {
                         SpinnerState.CULINARY
                     }
-                    states[2] -> {
+                    SpinnerState.BOTANIC.description -> {
                         SpinnerState.BOTANIC
                     }
                     else -> {
