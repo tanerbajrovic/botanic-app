@@ -21,13 +21,24 @@ class MainActivity : AppCompatActivity() {
         SpinnerState.BOTANIC.description,
         SpinnerState.CULINARY.description)
     private var listOfPlants: List<Biljka> = getPlants()
+    private var spinnerState: SpinnerState = SpinnerState.MEDICAL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        var spinnerState: SpinnerState = SpinnerState.MEDICAL
         val resetButton: Button = findViewById(R.id.resetBtn)
         plants = findViewById(R.id.biljkeRV)
+        spinner = findViewById(R.id.modSpinner)
+        configureRecyclerView()
+        configureSpinner()
+        resetButton.setOnClickListener {
+            spinner.setSelection(0)
+            plantsAdapter.resetPlants()
+        }
+    }
+
+    // RecyclerView configuration
+    private fun configureRecyclerView() {
         plants.layoutManager = LinearLayoutManager(
             this,
             LinearLayoutManager.VERTICAL,
@@ -36,10 +47,18 @@ class MainActivity : AppCompatActivity() {
         plantsAdapter = PlantListAdapter(listOf(), spinnerState)
         plants.adapter = plantsAdapter
         plantsAdapter.updatePlants(listOfPlants)
-        spinner = findViewById(R.id.modSpinner)
+    }
+
+    // Spinner configuration
+    private fun configureSpinner() {
         spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, states)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = spinnerAdapter
+        attachSpinnerOnItemListener()
+    }
+
+    // Implements on item click logic for changing spinner selection
+    private fun attachSpinnerOnItemListener() {
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val newItem: String = states[p2]
@@ -63,10 +82,6 @@ class MainActivity : AppCompatActivity() {
                 spinner.setSelection(0)
                 spinnerState = SpinnerState.MEDICAL
             }
-        }
-        resetButton.setOnClickListener {
-            spinner.setSelection(0)
-            plantsAdapter.resetPlants()
         }
     }
 
