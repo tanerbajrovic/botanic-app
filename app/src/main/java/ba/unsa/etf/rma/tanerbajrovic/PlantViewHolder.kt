@@ -59,6 +59,7 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         override fun bind(plant: Biljka) {
             super.bind(plant)
             plantWarning.text = plant.medicinskoUpozorenje
+            // Display at most three remedies (or display nothing when empty)
             for (i in 0 until minOf(plant.medicinskeKoristi.size, 3)) {
                 when (i) {
                     1 -> plantRemedyOne.text = plant.medicinskeKoristi[0].opis
