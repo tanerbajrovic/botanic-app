@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.tanerbajrovic
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val resetButton: Button = findViewById(R.id.resetBtn)
+        val newPlantButton: Button = findViewById(R.id.novaBiljkaBtn)
         plants = findViewById(R.id.biljkeRV)
         spinner = findViewById(R.id.modSpinner)
         configureRecyclerView()
@@ -34,6 +36,9 @@ class MainActivity : AppCompatActivity() {
         resetButton.setOnClickListener {
             spinner.setSelection(0)
             plantsAdapter.resetPlants()
+        }
+        newPlantButton.setOnClickListener {
+            openNewPlantActivity()
         }
     }
 
@@ -83,6 +88,11 @@ class MainActivity : AppCompatActivity() {
                 spinnerState = SpinnerState.MEDICAL
             }
         }
+    }
+
+    private fun openNewPlantActivity() {
+        val intent = Intent(this, NovaBiljkaActivity::class.java)
+        startActivity(intent)
     }
 
 }
