@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
             plantsAdapter.resetPlants()
         }
         newPlantButton.setOnClickListener {
-            openNewPlantActivity()
+            showNewPlantActivity()
         }
     }
 
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openNewPlantActivity() {
+    private fun showNewPlantActivity() {
         val intent = Intent(this, NovaBiljkaActivity::class.java)
         startActivity(intent)
     }
