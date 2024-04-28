@@ -1,17 +1,28 @@
 package ba.unsa.etf.rma.tanerbajrovic
 
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 // TODO
 // - Indicate when selected in ListView
 // - Add/Modify button functionality for dishes
 // - Validate selection in TasteProfile
+
+// TODO Improvements:
+// - Use one configuration method for every ListView and Adapter
 
 class NovaBiljkaActivity : AppCompatActivity() {
 
@@ -28,6 +39,8 @@ class NovaBiljkaActivity : AppCompatActivity() {
     private lateinit var climateTypesAdapter: ArrayAdapter<String>
 
     private lateinit var addPlantButton: Button
+    private lateinit var capturePlantButton: Button
+    private lateinit var plantImage: ImageView
     private lateinit var plantName: EditText
     private lateinit var plantFamily: EditText
     private lateinit var plantWarning: EditText
@@ -39,12 +52,50 @@ class NovaBiljkaActivity : AppCompatActivity() {
     private lateinit var soilTypes: ListView
     private lateinit var climateTypes: ListView
 
+    private val validator: Validator = Validator()
+
+    inner class Validator {
+
+        fun isValidText(editText: EditText): Boolean {
+            return (editText.text.length in 2..20)
+        }
+
+        fun isValidDish(dish: EditText): Boolean {
+            val dishName = dish.text.toString().uppercase()
+            for (currentDish: String in dishesList) {
+                if (currentDish.uppercase() == dishName)
+                    return false
+            }
+            return true
+        }
+
+        fun isValidDishList(): Boolean {
+            return dishesList.isNotEmpty()
+        }
+
+        fun hasRequiredPermissions(): Boolean {
+            val cameraPermissionStatus: Int = ContextCompat.checkSelfPermission(
+                this@NovaBiljkaActivity,
+                android.Manifest.permission.CAMERA)
+            return cameraPermissionStatus == PackageManager.PERMISSION_GRANTED
+        }
+
+
+    }
+
+    companion object {
+        private const val CAMERA_PERMISSION_CODE = 1
+        private const val CAMERA_REQUEST_CODE = 2
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_plant)
         plantName = findViewById(R.id.nazivET)
         plantFamily = findViewById(R.id.porodicaET)
         plantWarning = findViewById(R.id.medicinskoUpozorenjeET)
+        plantImage = findViewById(R.id.slikaIV)
+        capturePlantButton = findViewById(R.id.uslikajBiljkuBtn)
         dish = findViewById(R.id.jeloET)
         dishButton = findViewById(R.id.dodajJeloBtn)
         dishes = findViewById(R.id.jelaLV)
@@ -52,7 +103,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
         tasteProfiles = findViewById(R.id.profilOkusaLV)
         soilTypes = findViewById(R.id.zemljisniTipLV)
         climateTypes = findViewById(R.id.klimatskiTipLV)
-        addPlantButton= findViewById(R.id.dodajBiljkuBtn)
+        addPlantButton = findViewById(R.id.dodajBiljkuBtn)
         configureDishes()
         configureMedicalRemedies()
         configureSoilTypes()
@@ -60,11 +111,95 @@ class NovaBiljkaActivity : AppCompatActivity() {
         configureClimateTypes()
         addPlantButton.setOnClickListener {
             processPlantForm()
-            // Return to MainActivity
+            // Create Plant object and return to MainActivity
         }
         dishButton.setOnClickListener {
             processDishInput()
             dishesAdapter.notifyDataSetChanged()
+        }
+        capturePlantButton.setOnClickListener {
+            // Checking permissions
+            if (!validator.hasRequiredPermissions()) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.CAMERA),
+                    CAMERA_PERMISSION_CODE
+                )
+            }
+            else {
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                startActivityForResult(intent, CAMERA_REQUEST_CODE)
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                startActivityForResult(intent, CAMERA_REQUEST_CODE)
+            }
+            else {
+                val errorMessage = getString(R.string.insufficient_camera_permission_message)
+                Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+            }
+        }
+
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // Assert that data is not null (!!)
+            val imageThumbnail: Bitmap = data!!.extras!!.get("data") as Bitmap
+            plantImage.setImageBitmap(imageThumbnail)
+        }
+    }
+
+    /**
+     * Validates and processes the whole form
+     */
+    private fun processPlantForm() {
+
+        val invalidTextMessage = getString(R.string.invalid_text_input_message)
+
+        if (!validator.isValidText(plantName)) {
+            plantName.error = invalidTextMessage
+        }
+
+        if (!validator.isValidText(plantFamily)) {
+            plantFamily.error = invalidTextMessage
+        }
+
+        if (!validator.isValidText(plantWarning)) {
+            plantWarning.error = invalidTextMessage
+        }
+
+        if (!validator.isValidDishList()) {
+            val invalidDishesMessage = getString(R.string.invalid_number_of_dishes_message)
+            val toast = Toast.makeText(this, invalidDishesMessage, Toast.LENGTH_SHORT)
+            toast.show()
+        }
+
+    }
+
+    /**
+     * Validates and processes adding new dishes
+      */
+    private fun processDishInput() {
+        if (!validator.isValidText(dish)) {
+            dish.error = getString(R.string.invalid_text_input_message)
+        }
+        else if (!validator.isValidDish(dish)) {
+            dish.error = getString(R.string.invalid_dish_duplicate_message)
+        }
+        else {
+            val dishName = dish.text.toString()
+            dishesList.add(dishName)
+            dish.text.clear()
         }
     }
 
@@ -104,63 +239,6 @@ class NovaBiljkaActivity : AppCompatActivity() {
         climateTypesAdapter = ArrayAdapter(this,
             android.R.layout.simple_list_item_1, climateTypesList)
         climateTypes.adapter = climateTypesAdapter
-    }
-
-    // Validates and processes the whole form
-    private fun processPlantForm() {
-
-        val invalidTextMessage = getString(R.string.invalid_text_input_message)
-
-        if (isInvalidText(plantName)) {
-            plantName.error = invalidTextMessage
-        }
-
-        if (isInvalidText(plantFamily)) {
-            plantFamily.error = invalidTextMessage
-        }
-
-        if (isInvalidText(plantWarning)) {
-            plantWarning.error = invalidTextMessage
-        }
-
-        if (isInvalidDishesList()) {
-            val invalidDishesMessage = getString(R.string.invalid_number_of_dishes_message)
-            val toast = Toast.makeText(this, invalidDishesMessage, Toast.LENGTH_SHORT)
-            toast.show()
-        }
-
-    }
-
-    // Validates and processes adding new dishes
-    private fun processDishInput() {
-        if (isInvalidText(dish)) {
-            dish.error = getString(R.string.invalid_text_input_message)
-        }
-        else if (isInvalidDish(dish)) {
-            dish.error = getString(R.string.invalid_dish_duplicate_message)
-        }
-        else {
-            val dishName = dish.text.toString()
-            dishesList.add(dishName)
-            dish.text.clear()
-        }
-    }
-
-    private fun isInvalidText(editText: EditText): Boolean {
-        return (editText.text.length < 2 || editText.text.length > 20)
-    }
-
-    private fun isInvalidDish(dish: EditText): Boolean {
-        val dishName = dish.text.toString().uppercase()
-        for (currentDish: String in dishesList) {
-            if (currentDish.uppercase() == dishName)
-                return true
-        }
-        return false
-    }
-
-    private fun isInvalidDishesList(): Boolean {
-        return dishesList.isEmpty()
     }
 
 }
