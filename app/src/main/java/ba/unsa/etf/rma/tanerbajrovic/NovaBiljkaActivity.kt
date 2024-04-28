@@ -7,6 +7,8 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
+import android.util.Log
+import android.util.SparseBooleanArray
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -29,11 +31,11 @@ import androidx.core.content.ContextCompat
 
 class NovaBiljkaActivity : AppCompatActivity() {
 
-    private var medicalRemediesList: MutableList<String?> = mutableListOf()
-    private var tasteProfilesList: MutableList<String?> = mutableListOf()
-    private var climateTypesList: MutableList<String?> = mutableListOf()
-    private var soilTypesList: MutableList<String?> = mutableListOf()
-    private var dishesList: MutableList<String?> = mutableListOf()
+    private var medicalRemediesList: MutableList<String> = mutableListOf()
+    private var tasteProfilesList: MutableList<String> = mutableListOf()
+    private var climateTypesList: MutableList<String> = mutableListOf()
+    private var soilTypesList: MutableList<String> = mutableListOf()
+    private var dishesList: MutableList<String> = mutableListOf()
 
     private lateinit var remediesAdapter: ArrayAdapter<String>
     private lateinit var tasteProfilesAdapter: ArrayAdapter<String>
@@ -171,7 +173,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
      */
     private fun processPlantForm() {
 
-        var isInvalid: Boolean = false
+        var isInvalid= false
         val invalidTextMessage = getString(R.string.invalid_text_input_message)
 
         if (!validator.isValidText(plantName)) {
@@ -199,8 +201,8 @@ class NovaBiljkaActivity : AppCompatActivity() {
         // Additional validation stuff
 
         if (!validator.isValidList(medicalRemedies)) {
-            val invalidMedicaRemediesMessage = getString(R.string.insufficient_number_of_remedies)
-            val toast = Toast.makeText(this, invalidMedicaRemediesMessage, Toast.LENGTH_SHORT)
+            val invalidMedicalRemediesMessage = getString(R.string.insufficient_number_of_remedies)
+            val toast = Toast.makeText(this, invalidMedicalRemediesMessage, Toast.LENGTH_SHORT)
             toast.show()
             isInvalid = true
         }
@@ -228,14 +230,52 @@ class NovaBiljkaActivity : AppCompatActivity() {
 
         if (!isInvalid) {
 
-//            val plantMedicalRemedies: List<MedicinskaKorist> =
-//
-//            val plant: Biljka = Biljka(
-//                plantName.text.toString(),
-//                plantFamily.text.toString(),
-//                plantWarning.text.toString(),
-//            )
-            val intent = Intent(this, MainActivity::class.java)
+            val plantMedicalRemedies: MutableList<MedicinskaKorist> = mutableListOf()
+            val checkedRemedies: SparseBooleanArray = medicalRemedies.checkedItemPositions
+            for (i in 0 until medicalRemedies.adapter.count) {
+                if (checkedRemedies.get(i)) {
+                    MedicinskaKorist.entries.find { it.opis == medicalRemediesList[i]}
+                        ?.let { plantMedicalRemedies.add(it) }
+                }
+            }
+
+            val plantClimateTypes: MutableList<KlimatskiTip> = mutableListOf()
+            val checkedClimateTypes: SparseBooleanArray = climateTypes.checkedItemPositions
+            for (i in 0 until climateTypes.adapter.count) {
+                if (checkedClimateTypes.get(i)) {
+                    KlimatskiTip.entries.find { it.opis == climateTypesList[i]}
+                        ?.let { plantClimateTypes.add(it) }
+                }
+            }
+
+            val plantSoilTypes: MutableList<Zemljiste> = mutableListOf()
+            val checkedSoilTypes: SparseBooleanArray = soilTypes.checkedItemPositions
+            for (i in 0 until soilTypes.adapter.count) {
+                if (checkedSoilTypes.get(i)) {
+                    Zemljiste.entries.find { it.naziv == soilTypesList[i]}
+                        ?.let { plantSoilTypes.add(it) }
+                }
+            }
+
+//            Log.e("Test", tasteProfiles.selectedItemPosition.toString())
+            val plantTasteProfile: ProfilOkusaBiljke = ProfilOkusaBiljke.entries.find {
+                it.opis == tasteProfilesList[tasteProfiles.selectedItemPosition]
+            }!!
+
+            val plant = Biljka(
+                plantName.text.toString(),
+                plantFamily.text.toString(),
+                plantWarning.text.toString(),
+                plantMedicalRemedies,
+                plantTasteProfile,
+                dishesList,
+                plantClimateTypes,
+                plantSoilTypes
+            )
+
+            val intent = Intent()
+            intent.putExtra("PLANT_OBJECT", plant)
+            setResult(Activity.RESULT_OK, intent)
             startActivity(intent)
         }
     }
@@ -301,6 +341,19 @@ class NovaBiljkaActivity : AppCompatActivity() {
         tasteProfilesAdapter = ArrayAdapter(this,
             android.R.layout.simple_list_item_1, tasteProfilesList)
         tasteProfiles.adapter = tasteProfilesAdapter
+        tasteProfiles.onItemClickListener = object : AdapterView.OnItemSelectedListener,
+            AdapterView.OnItemClickListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                Toast.makeText(this@NovaBiljkaActivity, tasteProfilesList[p2], Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                onItemSelected(p0, p1, p2, p3)
+            }
+        }
     }
 
     /**
@@ -314,7 +367,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
             AdapterView.OnItemClickListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 isInEditMode = true
-                val currentDish: String? = dishesList[p2]
+                val currentDish: String = dishesList[p2]
                 val editable: Editable = Editable.Factory.getInstance().newEditable(currentDish)
                 dish.text = editable
                 addDishButton.text = getText(R.string.edit_dish)
@@ -332,6 +385,9 @@ class NovaBiljkaActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Configure ListView and adapter
+     */
     private fun configureSoilTypes() {
         for (soilType: Zemljiste in Zemljiste.entries)
             soilTypesList.add(soilType.naziv)

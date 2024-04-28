@@ -1,6 +1,8 @@
 package ba.unsa.etf.rma.tanerbajrovic
 
+import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -8,6 +10,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -24,8 +27,12 @@ class MainActivity : AppCompatActivity() {
         SpinnerState.MEDICAL.description,
         SpinnerState.BOTANIC.description,
         SpinnerState.CULINARY.description)
-    private var listOfPlants: List<Biljka> = getPlants()
+    private var listOfPlants: MutableList<Biljka> = getPlants()
     private var spinnerState: SpinnerState = SpinnerState.MEDICAL
+
+    companion object {
+        private const val NEW_PLANT_REQUEST_CODE = 3
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +102,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun showNewPlantActivity() {
         val intent = Intent(this, NovaBiljkaActivity::class.java)
-        startActivity(intent)
+        startActivityForResult(intent, NEW_PLANT_REQUEST_CODE)
+    }
+
+    @Deprecated("Deprecated in Java")
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == NEW_PLANT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val newPlant: Biljka = data?.getParcelableExtra("PLANT_OBJECT", Biljka::class.java)!!
+            listOfPlants.add(newPlant)
+            plantsAdapter.notifyDataSetChanged()
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 package ba.unsa.etf.rma.tanerbajrovic
 
-fun getPlants(): List<Biljka> {
-    return listOf(
+fun getPlants(): MutableList<Biljka> {
+    return mutableListOf(
     Biljka(
         naziv = "Bosiljak (Ocimum basilicum)",
         porodica = "Lamiaceae (usnate)",
