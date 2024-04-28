@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">SpiralApp</string>
+    <string name="reset">Reset</string>
+    <string name="capture_plant">Uslikaj biljku</string>
+    <string name="add_dish">Dodaj jelo</string>
+    <string name="add_plant">Dodaj biljku</string>
     <string name="invalid_text_input_message">Neispravan broj karaktera (2 – 20)</string>
     <string name="invalid_dish_duplicate_message">Uneseno jelo je već u listi</string>
     <string name="invalid_number_of_dishes_message">Potrebno je unijeti bar jedno jelo</string>

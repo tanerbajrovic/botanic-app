@@ -91,7 +91,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    android:text="Uslikaj biljku"
+                    android:text="@string/capture_plant"
                     android:textColor="?attr/colorAccent"
                     />
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -116,7 +116,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/uslikajBiljku"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="@+id/jeloET"
-                android:text="Dodaj jelo"
+                android:text="@string/add_dish"
                 android:textColor="?attr/colorAccent"
                 />
 
@@ -202,7 +202,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="Dodaj biljku"
+        android:text="@string/add_plant"
         android:textAllCaps="true"
         android:textColor="?attr/colorAccent"
     />
