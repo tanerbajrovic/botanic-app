@@ -6,6 +6,9 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -45,13 +48,15 @@ class NovaBiljkaActivity : AppCompatActivity() {
     private lateinit var plantFamily: EditText
     private lateinit var plantWarning: EditText
     private lateinit var dish: EditText
-    private lateinit var dishButton: Button
+    private lateinit var addDishButton: Button
     private lateinit var dishes: ListView
     private lateinit var medicalRemedies: ListView
     private lateinit var tasteProfiles: ListView
     private lateinit var soilTypes: ListView
     private lateinit var climateTypes: ListView
 
+    private var previousDish: String? = null
+    private var isInEditMode: Boolean = false
     private val validator: Validator = Validator()
 
     inner class Validator {
@@ -97,7 +102,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
         plantImage = findViewById(R.id.slikaIV)
         capturePlantButton = findViewById(R.id.uslikajBiljkuBtn)
         dish = findViewById(R.id.jeloET)
-        dishButton = findViewById(R.id.dodajJeloBtn)
+        addDishButton = findViewById(R.id.dodajJeloBtn)
         dishes = findViewById(R.id.jelaLV)
         medicalRemedies = findViewById(R.id.medicinskaKoristLV)
         tasteProfiles = findViewById(R.id.profilOkusaLV)
@@ -113,7 +118,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
             processPlantForm()
             // Create Plant object and return to MainActivity
         }
-        dishButton.setOnClickListener {
+        addDishButton.setOnClickListener {
             processDishInput()
             dishesAdapter.notifyDataSetChanged()
         }
@@ -190,7 +195,31 @@ class NovaBiljkaActivity : AppCompatActivity() {
      * Validates and processes adding new dishes
       */
     private fun processDishInput() {
-        if (!validator.isValidText(dish)) {
+        if (isInEditMode) {
+            if (dish.text.isEmpty()) {
+                dishesList.remove(previousDish)
+                addDishButton.text = getString(R.string.add_dish)
+                dish.text.clear()
+                isInEditMode = false
+                previousDish = null
+            }
+            else if (validator.isValidText(dish)) {
+                for (i in dishesList.indices) {
+                    if (dishesList[i] == previousDish) {
+                        dishesList[i] = dish.text.toString()
+                        break
+                    }
+                }
+                addDishButton.text = getString(R.string.add_dish)
+                dish.text.clear()
+                isInEditMode = false
+                previousDish = null
+            }
+            else {
+                dish.error = getString(R.string.invalid_text_input_message)
+            }
+        }
+        else if (!validator.isValidText(dish)) {
             dish.error = getString(R.string.invalid_text_input_message)
         }
         else if (!validator.isValidDish(dish)) {
@@ -223,6 +252,27 @@ class NovaBiljkaActivity : AppCompatActivity() {
         dishesAdapter = ArrayAdapter(this,
             android.R.layout.simple_list_item_1, dishesList)
         dishes.adapter = dishesAdapter
+        dishes.onItemClickListener = object : AdapterView.OnItemSelectedListener,
+            AdapterView.OnItemClickListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                isInEditMode = true
+                val currentDish: String = dishesList[p2]
+                val editable: Editable = Editable.Factory.getInstance().newEditable(currentDish)
+                dish.text = editable
+                addDishButton.text = getText(R.string.edit_dish)
+                previousDish = currentDish
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                isInEditMode = false
+                previousDish = null
+            }
+
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                onItemSelected(p0, p1, p2, p3)
+            }
+
+        }
     }
 
     private fun configureSoilTypes() {
