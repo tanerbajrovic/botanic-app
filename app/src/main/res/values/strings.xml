@@ -5,8 +5,12 @@
     <string name="add_dish">Dodaj jelo</string>
     <string name="add_plant">Dodaj biljku</string>
     <string name="edit_dish">Izmijeni jelo</string>
+    <string name="insufficient_number_of_remedies">Odaberite barem jednu medicinsku korist.</string>
+    <string name="insufficient_number_of_soils">Odaberite barem jedan zemljišni tip.</string>
+    <string name="insufficient_number_of_climate">Odaberite barem jedan klimatski tip.</string>
+    <string name="insufficient_number_of_taste_profile">Odaberite jedan profil ukusa.</string>
     <string name="insufficient_camera_permission_message">Nije moguće pristupiti kameri. Dodajte dozvolu aplikaciji u postavkama.</string>
     <string name="invalid_text_input_message">Neispravan broj karaktera (2 – 20)</string>
-    <string name="invalid_dish_duplicate_message">Uneseno jelo je već u listi</string>
-    <string name="invalid_number_of_dishes_message">Potrebno je unijeti bar jedno jelo</string>
+    <string name="invalid_dish_duplicate_message">Uneseno jelo je već u listi.</string>
+    <string name="invalid_number_of_dishes_message">Potrebno je unijeti bar jedno jelo.</string>
 </resources>

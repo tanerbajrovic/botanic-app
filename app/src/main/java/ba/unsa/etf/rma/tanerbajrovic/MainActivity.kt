@@ -11,6 +11,9 @@ import android.widget.Spinner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+// TODO
+// Change to default mode on return from NewPlantActivity
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var plants: RecyclerView

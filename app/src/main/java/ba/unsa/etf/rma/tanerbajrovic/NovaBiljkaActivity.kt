@@ -29,11 +29,11 @@ import androidx.core.content.ContextCompat
 
 class NovaBiljkaActivity : AppCompatActivity() {
 
-    private var medicalRemediesList: MutableList<String> = mutableListOf()
-    private var tasteProfilesList: MutableList<String> = mutableListOf()
-    private var climateTypesList: MutableList<String> = mutableListOf()
-    private var soilTypesList: MutableList<String> = mutableListOf()
-    private var dishesList: MutableList<String> = mutableListOf()
+    private var medicalRemediesList: MutableList<String?> = mutableListOf()
+    private var tasteProfilesList: MutableList<String?> = mutableListOf()
+    private var climateTypesList: MutableList<String?> = mutableListOf()
+    private var soilTypesList: MutableList<String?> = mutableListOf()
+    private var dishesList: MutableList<String?> = mutableListOf()
 
     private lateinit var remediesAdapter: ArrayAdapter<String>
     private lateinit var tasteProfilesAdapter: ArrayAdapter<String>
@@ -67,8 +67,8 @@ class NovaBiljkaActivity : AppCompatActivity() {
 
         fun isValidDish(dish: EditText): Boolean {
             val dishName = dish.text.toString().uppercase()
-            for (currentDish: String in dishesList) {
-                if (currentDish.uppercase() == dishName)
+            for (currentDish: String? in dishesList) {
+                if (currentDish!!.uppercase() == dishName)
                     return false
             }
             return true
@@ -78,13 +78,16 @@ class NovaBiljkaActivity : AppCompatActivity() {
             return dishesList.isNotEmpty()
         }
 
+        fun isValidList(listview: ListView): Boolean {
+            return listview.checkedItemCount > 0
+        }
+
         fun hasRequiredPermissions(): Boolean {
             val cameraPermissionStatus: Int = ContextCompat.checkSelfPermission(
                 this@NovaBiljkaActivity,
                 android.Manifest.permission.CAMERA)
             return cameraPermissionStatus == PackageManager.PERMISSION_GRANTED
         }
-
 
     }
 
@@ -116,7 +119,6 @@ class NovaBiljkaActivity : AppCompatActivity() {
         configureClimateTypes()
         addPlantButton.setOnClickListener {
             processPlantForm()
-            // Create Plant object and return to MainActivity
         }
         addDishButton.setOnClickListener {
             processDishInput()
@@ -169,26 +171,73 @@ class NovaBiljkaActivity : AppCompatActivity() {
      */
     private fun processPlantForm() {
 
+        var isInvalid: Boolean = false
         val invalidTextMessage = getString(R.string.invalid_text_input_message)
 
         if (!validator.isValidText(plantName)) {
             plantName.error = invalidTextMessage
+            isInvalid = true
         }
 
         if (!validator.isValidText(plantFamily)) {
             plantFamily.error = invalidTextMessage
+            isInvalid = true
         }
 
         if (!validator.isValidText(plantWarning)) {
             plantWarning.error = invalidTextMessage
+            isInvalid = true
         }
 
         if (!validator.isValidDishList()) {
             val invalidDishesMessage = getString(R.string.invalid_number_of_dishes_message)
             val toast = Toast.makeText(this, invalidDishesMessage, Toast.LENGTH_SHORT)
             toast.show()
+            isInvalid = true
         }
 
+        // Additional validation stuff
+
+        if (!validator.isValidList(medicalRemedies)) {
+            val invalidMedicaRemediesMessage = getString(R.string.insufficient_number_of_remedies)
+            val toast = Toast.makeText(this, invalidMedicaRemediesMessage, Toast.LENGTH_SHORT)
+            toast.show()
+            isInvalid = true
+        }
+
+        if (!validator.isValidList(climateTypes)) {
+            val invalidClimateTypesMessage = getString(R.string.insufficient_number_of_climate)
+            val toast = Toast.makeText(this, invalidClimateTypesMessage, Toast.LENGTH_SHORT)
+            toast.show()
+            isInvalid = true
+        }
+
+        if (!validator.isValidList(soilTypes)) {
+            val invalidSoilTypesMessage = getString(R.string.insufficient_number_of_soils)
+            val toast = Toast.makeText(this, invalidSoilTypesMessage, Toast.LENGTH_SHORT)
+            toast.show()
+            isInvalid = true
+        }
+
+        if (!validator.isValidList(tasteProfiles)) {
+            val invalidTasteProfilesMessage = getString(R.string.insufficient_number_of_taste_profile)
+            val toast = Toast.makeText(this, invalidTasteProfilesMessage, Toast.LENGTH_SHORT)
+            toast.show()
+            isInvalid = true
+        }
+
+        if (!isInvalid) {
+
+//            val plantMedicalRemedies: List<MedicinskaKorist> =
+//
+//            val plant: Biljka = Biljka(
+//                plantName.text.toString(),
+//                plantFamily.text.toString(),
+//                plantWarning.text.toString(),
+//            )
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     /**
@@ -232,6 +281,9 @@ class NovaBiljkaActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Configure ListView and adapter
+     */
     private fun configureMedicalRemedies() {
         for (medicalRemedy: MedicinskaKorist in MedicinskaKorist.entries)
             medicalRemediesList.add(medicalRemedy.opis)
@@ -240,6 +292,9 @@ class NovaBiljkaActivity : AppCompatActivity() {
         medicalRemedies.adapter = remediesAdapter
     }
 
+    /**
+     * Configure ListView and adapter
+     */
     private fun configureTasteProfiles() {
         for (tasteProfile: ProfilOkusaBiljke in ProfilOkusaBiljke.entries)
             tasteProfilesList.add(tasteProfile.opis)
@@ -248,6 +303,9 @@ class NovaBiljkaActivity : AppCompatActivity() {
         tasteProfiles.adapter = tasteProfilesAdapter
     }
 
+    /**
+     * Configure ListView and adapter
+     */
     private fun configureDishes() {
         dishesAdapter = ArrayAdapter(this,
             android.R.layout.simple_list_item_1, dishesList)
@@ -256,7 +314,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
             AdapterView.OnItemClickListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 isInEditMode = true
-                val currentDish: String = dishesList[p2]
+                val currentDish: String? = dishesList[p2]
                 val editable: Editable = Editable.Factory.getInstance().newEditable(currentDish)
                 dish.text = editable
                 addDishButton.text = getText(R.string.edit_dish)
@@ -271,7 +329,6 @@ class NovaBiljkaActivity : AppCompatActivity() {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 onItemSelected(p0, p1, p2, p3)
             }
-
         }
     }
 
@@ -283,6 +340,9 @@ class NovaBiljkaActivity : AppCompatActivity() {
         soilTypes.adapter = soilTypesAdapter
     }
 
+    /**
+     * Configure ListView and adapter
+     */
     private fun configureClimateTypes() {
         for (climateType: KlimatskiTip in KlimatskiTip.entries)
             climateTypesList.add(climateType.opis)
