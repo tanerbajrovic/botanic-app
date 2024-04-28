@@ -5,7 +5,13 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+
+// TODO
+// - Indicate when selected in ListView
+// - Add/Modify button functionality for dishes
+// - Validate selection in TasteProfile
 
 class NovaBiljkaActivity : AppCompatActivity() {
 
@@ -14,6 +20,12 @@ class NovaBiljkaActivity : AppCompatActivity() {
     private var climateTypesList: MutableList<String> = mutableListOf()
     private var soilTypesList: MutableList<String> = mutableListOf()
     private var dishesList: MutableList<String> = mutableListOf()
+
+    private lateinit var remediesAdapter: ArrayAdapter<String>
+    private lateinit var tasteProfilesAdapter: ArrayAdapter<String>
+    private lateinit var soilTypesAdapter: ArrayAdapter<String>
+    private lateinit var dishesAdapter: ArrayAdapter<String>
+    private lateinit var climateTypesAdapter: ArrayAdapter<String>
 
     private lateinit var addPlantButton: Button
     private lateinit var plantName: EditText
@@ -30,10 +42,6 @@ class NovaBiljkaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_plant)
-        populateTasteProfiles()
-        populateSoilTypes()
-        populateClimateTypes()
-        populateMedicalRemedies()
         plantName = findViewById(R.id.nazivET)
         plantFamily = findViewById(R.id.porodicaET)
         plantWarning = findViewById(R.id.medicinskoUpozorenjeET)
@@ -45,75 +53,64 @@ class NovaBiljkaActivity : AppCompatActivity() {
         soilTypes = findViewById(R.id.zemljisniTipLV)
         climateTypes = findViewById(R.id.klimatskiTipLV)
         addPlantButton= findViewById(R.id.dodajBiljkuBtn)
-        val remediesAdapter: ArrayAdapter<String> = ArrayAdapter(this,
-            android.R.layout.simple_list_item_1, medicalRemediesList)
-        val tasteProfileAdapter: ArrayAdapter<String> = ArrayAdapter(this,
-            android.R.layout.simple_list_item_1, tasteProfilesList)
-        val soilTypeAdapter: ArrayAdapter<String> = ArrayAdapter(this,
-            android.R.layout.simple_list_item_1, soilTypesList)
-        val dishesAdapter: ArrayAdapter<String> = ArrayAdapter(this,
-            android.R.layout.simple_list_item_1, dishesList)
-        val climateTypesAdapter: ArrayAdapter<String> = ArrayAdapter(this,
-            android.R.layout.simple_list_item_1, climateTypesList)
-        medicalRemedies.adapter = remediesAdapter
-        tasteProfiles.adapter = tasteProfileAdapter
-        soilTypes.adapter = soilTypeAdapter
-        dishes.adapter = dishesAdapter
-        climateTypes.adapter = climateTypesAdapter
+        configureDishes()
+        configureMedicalRemedies()
+        configureSoilTypes()
+        configureTasteProfiles()
+        configureClimateTypes()
         addPlantButton.setOnClickListener {
-            checkFormValidation()
+            processPlantForm()
+            // Return to MainActivity
         }
         dishButton.setOnClickListener {
-            checkDishValidation()
+            processDishInput()
             dishesAdapter.notifyDataSetChanged()
         }
-        remediesAdapter.notifyDataSetChanged()
-        tasteProfileAdapter.notifyDataSetChanged()
-        soilTypeAdapter.notifyDataSetChanged()
-        dishesAdapter.notifyDataSetChanged()
-        climateTypesAdapter.notifyDataSetChanged()
     }
 
-    private fun populateMedicalRemedies() {
-        val medicalRemediesRaw: Array<MedicinskaKorist> = MedicinskaKorist.entries.toTypedArray()
-        for (medicalRemedy: MedicinskaKorist in medicalRemediesRaw) {
+    private fun configureMedicalRemedies() {
+        for (medicalRemedy: MedicinskaKorist in MedicinskaKorist.entries)
             medicalRemediesList.add(medicalRemedy.opis)
-        }
+        remediesAdapter = ArrayAdapter(this,
+            android.R.layout.simple_list_item_1, medicalRemediesList)
+        medicalRemedies.adapter = remediesAdapter
     }
 
-    private fun populateTasteProfiles() {
-        val tasteProfilesRaw: Array<ProfilOkusaBiljke> = ProfilOkusaBiljke.entries.toTypedArray()
-        for (tasteProfile: ProfilOkusaBiljke in tasteProfilesRaw) {
+    private fun configureTasteProfiles() {
+        for (tasteProfile: ProfilOkusaBiljke in ProfilOkusaBiljke.entries)
             tasteProfilesList.add(tasteProfile.opis)
-        }
+        tasteProfilesAdapter = ArrayAdapter(this,
+            android.R.layout.simple_list_item_1, tasteProfilesList)
+        tasteProfiles.adapter = tasteProfilesAdapter
     }
 
-    private fun populateSoilTypes() {
-        val soilTypesRaw: Array<Zemljiste> = Zemljiste.entries.toTypedArray()
-        for (soilType: Zemljiste in soilTypesRaw) {
+    private fun configureDishes() {
+        dishesAdapter = ArrayAdapter(this,
+            android.R.layout.simple_list_item_1, dishesList)
+        dishes.adapter = dishesAdapter
+    }
+
+    private fun configureSoilTypes() {
+        for (soilType: Zemljiste in Zemljiste.entries)
             soilTypesList.add(soilType.naziv)
-        }
+        soilTypesAdapter = ArrayAdapter(this,
+            android.R.layout.simple_list_item_1, soilTypesList)
+        soilTypes.adapter = soilTypesAdapter
     }
 
-    private fun populateClimateTypes() {
-        val climateTypesRaw: Array<KlimatskiTip> = KlimatskiTip.entries.toTypedArray()
-        for (climateType: KlimatskiTip in climateTypesRaw) {
+    private fun configureClimateTypes() {
+        for (climateType: KlimatskiTip in KlimatskiTip.entries)
             climateTypesList.add(climateType.opis)
-        }
+        climateTypesAdapter = ArrayAdapter(this,
+            android.R.layout.simple_list_item_1, climateTypesList)
+        climateTypes.adapter = climateTypesAdapter
     }
 
-// Try to make this generic
-//    private fun populateDetails(list: MutableList<String>, enum: Enum<*>) {
-//        val rawData = enum
-//
-//    }
+    // Validates and processes the whole form
+    private fun processPlantForm() {
 
-    // Checks validation of the whole form
-    private fun checkFormValidation() {
+        val invalidTextMessage = getString(R.string.invalid_text_input_message)
 
-        val invalidTextMessage= "Neispravan broj karaktera (3 - 19)" // ! Use @string for this.
-
-        // Checking EditTexts
         if (isInvalidText(plantName)) {
             plantName.error = invalidTextMessage
         }
@@ -126,27 +123,44 @@ class NovaBiljkaActivity : AppCompatActivity() {
             plantWarning.error = invalidTextMessage
         }
 
+        if (isInvalidDishesList()) {
+            val invalidDishesMessage = getString(R.string.invalid_number_of_dishes_message)
+            val toast = Toast.makeText(this, invalidDishesMessage, Toast.LENGTH_SHORT)
+            toast.show()
+        }
+
     }
 
-    // Checks validity of EditText content
-    private fun isInvalidText(editText: EditText): Boolean {
-        return (editText.text.length <= 2 || editText.text.length >= 20)
-    }
-
-    private fun checkDishValidation() {
+    // Validates and processes adding new dishes
+    private fun processDishInput() {
         if (isInvalidText(dish)) {
-            dish.error = "Neispravan broj karaktera (3 - 19)"
+            dish.error = getString(R.string.invalid_text_input_message)
+        }
+        else if (isInvalidDish(dish)) {
+            dish.error = getString(R.string.invalid_dish_duplicate_message)
         }
         else {
-            val currentDish: String = dish.text.toString()
-            if (currentDish in dishesList) {
-                dish.error = "Jelo je već u listi"
-            }
-            else {
-                // TODO
-                dishesList.add(currentDish)
-            }
+            val dishName = dish.text.toString()
+            dishesList.add(dishName)
+            dish.text.clear()
         }
+    }
+
+    private fun isInvalidText(editText: EditText): Boolean {
+        return (editText.text.length < 2 || editText.text.length > 20)
+    }
+
+    private fun isInvalidDish(dish: EditText): Boolean {
+        val dishName = dish.text.toString().uppercase()
+        for (currentDish: String in dishesList) {
+            if (currentDish.uppercase() == dishName)
+                return true
+        }
+        return false
+    }
+
+    private fun isInvalidDishesList(): Boolean {
+        return dishesList.isEmpty()
     }
 
 }
