@@ -1,9 +1,6 @@
 package ba.unsa.etf.rma.tanerbajrovic
 
-import android.os.Parcel
-import android.os.Parcelable
-
-enum class MedicinskaKorist(val opis: String) : Parcelable {
+enum class MedicinskaKorist(val opis: String) {
 
     SMIRENJE("Smirenje - za smirenje i relaksaciju"),
     PROTUUPALNO("Protuupalno - za smanjenje upale"),
@@ -12,23 +9,4 @@ enum class MedicinskaKorist(val opis: String) : Parcelable {
     REGULACIJAPROBAVE("Regulacija probave"),
     PODRSKAIMUNITETU("Podrška imunitetu");
 
-    constructor(parcel: Parcel) : this(parcel.readString()!!)
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(opis)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<MedicinskaKorist> {
-        override fun createFromParcel(parcel: Parcel): MedicinskaKorist {
-            return MedicinskaKorist.valueOf(parcel.readString()!!)
-        }
-
-        override fun newArray(size: Int): Array<MedicinskaKorist?> {
-            return arrayOfNulls(size)
-        }
-    }
 }

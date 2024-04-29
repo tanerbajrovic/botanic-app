@@ -1,9 +1,6 @@
 package ba.unsa.etf.rma.tanerbajrovic
 
-import android.os.Parcel
-import android.os.Parcelable
-
-enum class ProfilOkusaBiljke(val opis: String) : Parcelable {
+enum class ProfilOkusaBiljke(val opis: String) {
 
     MENTA("Mentol - osvježavajući, hladan ukus"),
     CITRUSNI("Citrusni - osvježavajući, aromatičan"),
@@ -14,22 +11,4 @@ enum class ProfilOkusaBiljke(val opis: String) : Parcelable {
     AROMATICNO("Začinski - topli i aromatičan ukus"),
     GORKO("Gorak okus");
 
-    constructor(parcel: Parcel) : this(parcel.readString()!!)
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(opis)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<ProfilOkusaBiljke> {
-        override fun createFromParcel(parcel: Parcel): ProfilOkusaBiljke {
-            return ProfilOkusaBiljke.valueOf(parcel.readString()!!)
-        }
-
-        override fun newArray(size: Int): Array<ProfilOkusaBiljke?> {
-            return arrayOfNulls(size)
-        }
-    }
 }
