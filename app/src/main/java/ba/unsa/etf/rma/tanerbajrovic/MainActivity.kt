@@ -151,6 +151,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 listOfPlants.add(newPlant)
                 plantsAdapter.updatePlants(listOfPlants)
+                spinner.setSelection(0)
             }
         }
     }
