@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
-import android.util.Log
 import android.util.SparseBooleanArray
 import android.view.View
 import android.widget.AdapterView
@@ -20,14 +19,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-
-// TODO
-// - Indicate when selected in ListView
-// - Add/Modify button functionality for dishes
-// - Validate selection in TasteProfile
-
-// TODO Improvements:
-// - Use one configuration method for every ListView and Adapter
 
 class NovaBiljkaActivity : AppCompatActivity() {
 
@@ -230,53 +221,43 @@ class NovaBiljkaActivity : AppCompatActivity() {
 
         if (!isInvalid) {
 
-            val plantMedicalRemedies: MutableList<MedicinskaKorist> = mutableListOf()
+            val plantMedicalRemedies: MutableList<String> = mutableListOf()
             val checkedRemedies: SparseBooleanArray = medicalRemedies.checkedItemPositions
             for (i in 0 until medicalRemedies.adapter.count) {
                 if (checkedRemedies.get(i)) {
-                    MedicinskaKorist.entries.find { it.opis == medicalRemediesList[i]}
-                        ?.let { plantMedicalRemedies.add(it) }
+                     plantMedicalRemedies.add(medicalRemediesList[i])
                 }
             }
 
-            val plantClimateTypes: MutableList<KlimatskiTip> = mutableListOf()
+            val plantClimateTypes: MutableList<String> = mutableListOf()
             val checkedClimateTypes: SparseBooleanArray = climateTypes.checkedItemPositions
             for (i in 0 until climateTypes.adapter.count) {
                 if (checkedClimateTypes.get(i)) {
-                    KlimatskiTip.entries.find { it.opis == climateTypesList[i]}
-                        ?.let { plantClimateTypes.add(it) }
+                    plantClimateTypes.add(climateTypesList[i])
                 }
             }
 
-            val plantSoilTypes: MutableList<Zemljiste> = mutableListOf()
+            val plantSoilTypes: MutableList<String> = mutableListOf()
             val checkedSoilTypes: SparseBooleanArray = soilTypes.checkedItemPositions
             for (i in 0 until soilTypes.adapter.count) {
                 if (checkedSoilTypes.get(i)) {
-                    Zemljiste.entries.find { it.naziv == soilTypesList[i]}
-                        ?.let { plantSoilTypes.add(it) }
+                    plantSoilTypes.add(soilTypesList[i])
                 }
             }
 
-//            Log.e("Test", tasteProfiles.selectedItemPosition.toString())
-            val plantTasteProfile: ProfilOkusaBiljke = ProfilOkusaBiljke.entries.find {
-                it.opis == tasteProfilesList[tasteProfiles.selectedItemPosition]
-            }!!
-
-            val plant = Biljka(
-                plantName.text.toString(),
-                plantFamily.text.toString(),
-                plantWarning.text.toString(),
-                plantMedicalRemedies,
-                plantTasteProfile,
-                dishesList,
-                plantClimateTypes,
-                plantSoilTypes
-            )
+            val plantTasteProfile: String = tasteProfilesList[tasteProfiles.checkedItemPosition]
 
             val intent = Intent()
-            intent.putExtra("PLANT_OBJECT", plant)
+            intent.putStringArrayListExtra("medical_remedies", ArrayList(plantMedicalRemedies))
+            intent.putStringArrayListExtra("soil_types", ArrayList(plantSoilTypes))
+            intent.putStringArrayListExtra("climate_types", ArrayList(plantClimateTypes))
+            intent.putStringArrayListExtra("dishes", ArrayList(dishesList))
+            intent.putExtra("taste_profile", plantTasteProfile)
+            intent.putExtra("name", plantName.text.toString())
+            intent.putExtra("family", plantFamily.text.toString())
+            intent.putExtra("medical_warning", plantWarning.text.toString())
             setResult(Activity.RESULT_OK, intent)
-            startActivity(intent)
+            finish()
         }
     }
 
@@ -328,7 +309,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
         for (medicalRemedy: MedicinskaKorist in MedicinskaKorist.entries)
             medicalRemediesList.add(medicalRemedy.opis)
         remediesAdapter = ArrayAdapter(this,
-            android.R.layout.simple_list_item_1, medicalRemediesList)
+            android.R.layout.simple_list_item_multiple_choice, medicalRemediesList)
         medicalRemedies.adapter = remediesAdapter
     }
 
@@ -338,22 +319,10 @@ class NovaBiljkaActivity : AppCompatActivity() {
     private fun configureTasteProfiles() {
         for (tasteProfile: ProfilOkusaBiljke in ProfilOkusaBiljke.entries)
             tasteProfilesList.add(tasteProfile.opis)
+        tasteProfiles.choiceMode = ListView.CHOICE_MODE_SINGLE
         tasteProfilesAdapter = ArrayAdapter(this,
-            android.R.layout.simple_list_item_1, tasteProfilesList)
+            android.R.layout.simple_list_item_single_choice, tasteProfilesList)
         tasteProfiles.adapter = tasteProfilesAdapter
-        tasteProfiles.onItemClickListener = object : AdapterView.OnItemSelectedListener,
-            AdapterView.OnItemClickListener {
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                Toast.makeText(this@NovaBiljkaActivity, tasteProfilesList[p2], Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-            }
-
-            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                onItemSelected(p0, p1, p2, p3)
-            }
-        }
     }
 
     /**
@@ -392,7 +361,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
         for (soilType: Zemljiste in Zemljiste.entries)
             soilTypesList.add(soilType.naziv)
         soilTypesAdapter = ArrayAdapter(this,
-            android.R.layout.simple_list_item_1, soilTypesList)
+            android.R.layout.simple_list_item_multiple_choice, soilTypesList)
         soilTypes.adapter = soilTypesAdapter
     }
 
@@ -403,7 +372,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
         for (climateType: KlimatskiTip in KlimatskiTip.entries)
             climateTypesList.add(climateType.opis)
         climateTypesAdapter = ArrayAdapter(this,
-            android.R.layout.simple_list_item_1, climateTypesList)
+            android.R.layout.simple_list_item_multiple_choice, climateTypesList)
         climateTypes.adapter = climateTypesAdapter
     }
 

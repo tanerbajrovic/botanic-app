@@ -3,7 +3,6 @@ package ba.unsa.etf.rma.tanerbajrovic
 import android.app.Activity
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -11,11 +10,9 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
-// TODO
-// Change to default mode on return from NewPlantActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -110,10 +107,61 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == NEW_PLANT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val newPlant: Biljka = data?.getParcelableExtra("PLANT_OBJECT", Biljka::class.java)!!
-            listOfPlants.add(newPlant)
-            plantsAdapter.notifyDataSetChanged()
+            if (data != null) {
+                val plantName: String? = data.extras?.getString("name")
+                val plantFamily: String? = data.extras?.getString("family")
+                val plantWarning: String? = data.extras?.getString("medical_warning")
+                val dishes: ArrayList<String>? = data.extras?.getStringArrayList("dishes")
+                val plantRemedies: ArrayList<String>? = data.extras?.getStringArrayList("medical_remedies")
+                val plantClimateTypes: ArrayList<String>? = data.extras?.getStringArrayList("climate_types")
+                val plantSoilTypes: ArrayList<String>? = data.extras?.getStringArrayList("soil_types")
+                val tasteProfile: String? = data.extras?.getString("taste_profile")
+
+                // Converting Strings to respective Enums
+                val medicalRemedies: MutableList<MedicinskaKorist> = mutableListOf()
+                for (remedy: String in plantRemedies!!) {
+                    MedicinskaKorist.entries.find {
+                        it.opis == remedy
+                    }.let { medicalRemedies.add(it!!) }
+                }
+
+                val climateTypes: MutableList<KlimatskiTip> = mutableListOf()
+                for (climate: String in plantClimateTypes!!) {
+                    KlimatskiTip.entries.find {
+                        it.opis == climate
+                    }.let { climateTypes.add(it!!) }
+                }
+
+                val soilTypes: MutableList<Zemljiste> = mutableListOf()
+                for (soil: String in plantSoilTypes!!) {
+                    Zemljiste.entries.find {
+                        it.naziv == soil
+                    }.let { soilTypes.add(it!!) }
+                }
+
+                val newPlant = Biljka(
+                    plantName!!,
+                    plantFamily!!,
+                    plantWarning!!,
+                    medicalRemedies,
+                    getTasteProfileFromString(tasteProfile!!)!!,
+                    dishes!!.toList(),
+                    climateTypes,
+                    soilTypes
+                )
+                listOfPlants.add(newPlant)
+                plantsAdapter.updatePlants(listOfPlants)
+            }
         }
+    }
+
+    private fun getTasteProfileFromString(description: String): ProfilOkusaBiljke? {
+        for (value: ProfilOkusaBiljke in ProfilOkusaBiljke.entries) {
+            if (value.opis == description) {
+                return value
+            }
+        }
+        return null
     }
 
 }
