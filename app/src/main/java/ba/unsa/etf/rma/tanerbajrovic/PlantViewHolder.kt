@@ -11,7 +11,7 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     private val plantName: TextView = itemView.findViewById(R.id.nazivItem)
 
     open fun bind(plant: Biljka) {
-        plantImage.setImageResource(R.mipmap.default_tree)
+//        plantImage.setImageResource(R.mipmap.default_tree)
         plantName.text = plant.naziv
     }
 
@@ -42,9 +42,9 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             // Display at most three dishes (or display nothing when empty)
             for (i in 0 until minOf(plant.jela.size, 3)) {
                 when (i) {
-                    1 -> plantDishOne.text = plant.jela[0]
-                    2 -> plantDishTwo.text = plant.jela[1]
-                    3 -> plantDishThree.text = plant.jela[2]
+                    0 -> plantDishOne.text = plant.jela[0]
+                    1 -> plantDishTwo.text = plant.jela[1]
+                    2 -> plantDishThree.text = plant.jela[2]
                 }
             }
         }
@@ -62,9 +62,9 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             // Display at most three remedies (or display nothing when empty)
             for (i in 0 until minOf(plant.medicinskeKoristi.size, 3)) {
                 when (i) {
-                    1 -> plantRemedyOne.text = plant.medicinskeKoristi[0].opis
-                    2 -> plantRemedyTwo.text = plant.medicinskeKoristi[1].opis
-                    3 -> plantRemedyThree.text = plant.medicinskeKoristi[2].opis
+                    0 -> plantRemedyOne.text = plant.medicinskeKoristi[0].opis
+                    1 -> plantRemedyTwo.text = plant.medicinskeKoristi[1].opis
+                    2 -> plantRemedyThree.text = plant.medicinskeKoristi[2].opis
                 }
             }
         }

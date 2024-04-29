@@ -61,7 +61,7 @@ class PlantListAdapter(
     }
 
     fun updatePlants(plants: List<Biljka>) {
-        this.plants = plants
+        this.plants = plants.toList()
         filteredPlants = plants.toList()
         notifyDataSetChanged()
     }
