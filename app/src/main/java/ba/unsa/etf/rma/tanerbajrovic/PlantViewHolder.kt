@@ -11,7 +11,7 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     private val plantName: TextView = itemView.findViewById(R.id.nazivItem)
 
     open fun bind(plant: Biljka) {
-//        plantImage.setImageResource(R.mipmap.default_tree)
+        plantImage.setImageResource(R.mipmap.default_tree)
         plantName.text = plant.naziv
     }
 
