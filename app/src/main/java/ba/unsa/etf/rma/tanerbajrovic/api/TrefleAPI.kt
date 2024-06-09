@@ -1,5 +1,8 @@
-package ba.unsa.etf.rma.tanerbajrovic
+package ba.unsa.etf.rma.tanerbajrovic.api
 
+import ba.unsa.etf.rma.tanerbajrovic.BuildConfig
+import ba.unsa.etf.rma.tanerbajrovic.api.model.PlantResponse
+import ba.unsa.etf.rma.tanerbajrovic.api.model.PlantSearchResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

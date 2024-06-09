@@ -1,4 +1,4 @@
-package ba.unsa.etf.rma.tanerbajrovic
+package ba.unsa.etf.rma.tanerbajrovic.api
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
