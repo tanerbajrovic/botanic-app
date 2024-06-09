@@ -10,7 +10,10 @@
     <string name="insufficient_number_of_climate">Odaberite barem jedan klimatski tip.</string>
     <string name="insufficient_number_of_taste_profile">Odaberite jedan profil ukusa.</string>
     <string name="insufficient_camera_permission_message">Nije moguće pristupiti kameri. Dodajte dozvolu aplikaciji u postavkama.</string>
-    <string name="invalid_text_input_message">Neispravan broj karaktera (2 – 20)</string>
+    <string name="invalid_text_input_message">Neispravan broj karaktera (2 – 40)</string>
     <string name="invalid_dish_duplicate_message">Uneseno jelo je već u listi.</string>
     <string name="invalid_number_of_dishes_message">Potrebno je unijeti bar jedno jelo.</string>
+    <string name="invalid_latin_plant_name">Neispravano latinsko ime biljke unutar ()</string>
+    <string name="not_edible">NIJE JESTIVO></string>
+    <string name="toxic">TOKSIČNO</string>
 </resources>

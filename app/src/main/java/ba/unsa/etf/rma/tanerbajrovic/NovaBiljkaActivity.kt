@@ -55,7 +55,12 @@ class NovaBiljkaActivity : AppCompatActivity() {
     inner class Validator {
 
         fun isValidText(editText: EditText): Boolean {
-            return (editText.text.length in 2..20)
+            return (editText.text.length in 2..40)
+        }
+
+        fun doesContainLatinName(editText: EditText): Boolean {
+            val text: String = editText.text.toString()
+            return text.substringAfter("(").substringBefore("(").isNotEmpty()
         }
 
         fun isValidDish(dish: EditText): Boolean {
@@ -166,9 +171,15 @@ class NovaBiljkaActivity : AppCompatActivity() {
 
         var isInvalid= false
         val invalidTextMessage = getString(R.string.invalid_text_input_message)
+        val invalidLatinName = getString(R.string.invalid_latin_plant_name)
 
         if (!validator.isValidText(plantName)) {
             plantName.error = invalidTextMessage
+            isInvalid = true
+        }
+
+        if (!validator.doesContainLatinName(plantName)) {
+            plantName.error = invalidLatinName
             isInvalid = true
         }
 
