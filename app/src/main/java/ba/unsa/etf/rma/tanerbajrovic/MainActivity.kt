@@ -8,24 +8,40 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Spinner
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var plants: RecyclerView
     private lateinit var plantsAdapter: PlantListAdapter
-    private lateinit var spinner: Spinner
-    private lateinit var spinnerAdapter: ArrayAdapter<String>
+    private lateinit var modeSpinner: Spinner
+    private lateinit var modeSpinnerAdapter: ArrayAdapter<String>
     private val states: Array<String> = arrayOf(
         SpinnerState.MEDICAL.description,
         SpinnerState.BOTANIC.description,
         SpinnerState.CULINARY.description)
     private var listOfPlants: MutableList<Biljka> = getPlants()
     private var spinnerState: SpinnerState = SpinnerState.MEDICAL
+    private lateinit var quickSearchButton: Button
+    private lateinit var quickSearchText: EditText
+    private lateinit var colorSpinner: Spinner
+    private lateinit var colorSpinnerAdapter: ArrayAdapter<String>
+    private val colors: Array<String> = arrayOf(
+        "Red",
+        "Blue",
+        "Yellow",
+        "Orange",
+        "Purple",
+        "Brown",
+        "Green")
 
     companion object {
         private const val NEW_PLANT_REQUEST_CODE = 3
@@ -37,16 +53,44 @@ class MainActivity : AppCompatActivity() {
         val resetButton: Button = findViewById(R.id.resetBtn)
         val newPlantButton: Button = findViewById(R.id.novaBiljkaBtn)
         plants = findViewById(R.id.biljkeRV)
-        spinner = findViewById(R.id.modSpinner)
+        modeSpinner = findViewById(R.id.modSpinner)
+        quickSearchText = findViewById(R.id.pretragaET)
+        quickSearchButton = findViewById(R.id.brzaPretraga)
+        colorSpinner = findViewById(R.id.bojaSPIN)
         configureRecyclerView()
-        configureSpinner()
+        configureModeSpinner()
+        configureColorSpinner()
         resetButton.setOnClickListener {
-            spinner.setSelection(0)
+            modeSpinner.setSelection(0)
             plantsAdapter.resetPlants()
+        }
+        quickSearchButton.setOnClickListener {
+            // Does some stuff
+            TODO()
         }
         newPlantButton.setOnClickListener {
             showNewPlantActivity()
         }
+    }
+
+    private fun hideQuickSearchViews() {
+        makeInvisible(quickSearchText)
+        makeInvisible(quickSearchButton)
+        makeInvisible(colorSpinner)
+    }
+
+    private fun showQuickSearchViews() {
+        makeVisible(quickSearchText)
+        makeVisible(quickSearchButton)
+        makeVisible(colorSpinner)
+    }
+
+    private fun makeInvisible(view: View) {
+        view.visibility = View.INVISIBLE
+    }
+
+    private fun makeVisible(view: View) {
+        view.visibility = View.VISIBLE
     }
 
     // RecyclerView configuration
@@ -62,16 +106,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Spinner configuration
-    private fun configureSpinner() {
-        spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, states)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = spinnerAdapter
-        attachSpinnerOnItemListener()
+    private fun configureModeSpinner() {
+        modeSpinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, states)
+        modeSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        modeSpinner.adapter = modeSpinnerAdapter
+        attachModeSpinnerOnItemListener()
+    }
+
+    private fun configureColorSpinner() {
+        colorSpinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, colors)
+        colorSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        colorSpinner.adapter = colorSpinnerAdapter
     }
 
     // Implements on item click logic for changing spinner selection
-    private fun attachSpinnerOnItemListener() {
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+    private fun attachModeSpinnerOnItemListener() {
+        modeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val newItem: String = states[p2]
                 spinnerState = when (newItem) {
@@ -89,10 +139,15 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 plantsAdapter.changeSpinnerState(spinnerState)
+                if (spinnerState == SpinnerState.BOTANIC)
+                    showQuickSearchViews()
+                else
+                    hideQuickSearchViews()
             }
             override fun onNothingSelected(p0: AdapterView<*>?) {
-                spinner.setSelection(0)
+                modeSpinner.setSelection(0)
                 spinnerState = SpinnerState.MEDICAL
+                hideQuickSearchViews()
             }
         }
     }
@@ -139,7 +194,7 @@ class MainActivity : AppCompatActivity() {
                     }.let { soilTypes.add(it!!) }
                 }
 
-                val newPlant = Biljka(
+                var newPlant = Biljka(
                     plantName!!,
                     plantFamily!!,
                     plantWarning!!,
@@ -149,9 +204,18 @@ class MainActivity : AppCompatActivity() {
                     climateTypes,
                     soilTypes
                 )
+
+                // Fixing the incorrect values
+                val scope = CoroutineScope(Dispatchers.IO)
+                scope.launch {
+                    val trefleDAO = TrefleDAO()
+                    trefleDAO.setContext(applicationContext)
+                    newPlant = trefleDAO.fixData(newPlant)
+                }
+
                 listOfPlants.add(newPlant)
                 plantsAdapter.updatePlants(listOfPlants)
-                spinner.setSelection(0)
+                modeSpinner.setSelection(0)
             }
         }
     }
