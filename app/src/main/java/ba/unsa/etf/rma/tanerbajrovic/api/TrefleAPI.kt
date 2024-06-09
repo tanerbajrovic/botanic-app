@@ -14,7 +14,7 @@ interface TrefleAPI {
      * Searches plants according to query `q`.
      * @return `PlantSearchResponse` object containing `List<PlantResponse`
      */
-    @GET("plants/search?token=${BuildConfig.TREFLE_API_KEY}")
+    @GET("plants/search?token=${BuildConfig.TREFLE_API_KEY}&page=1")
     suspend fun searchPlants(@Query("q") query: String): Response<PlantSearchResponse>
 
     /**
