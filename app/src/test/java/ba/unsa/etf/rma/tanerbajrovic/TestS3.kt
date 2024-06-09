@@ -17,7 +17,7 @@ class TestS3 {
 
     @Test
     fun fixBosiljakTest() = runBlocking{
-        var fixed = TrefleDAO().fixData(    Biljka(
+        var fixed = TrefleDAO().fixData(Biljka(
             naziv = "Bosiljak (Ocimum basilicum)",
             porodica = "Netacno (usnate)",
             medicinskoUpozorenje = "Može iritati kožu osjetljivu na sunce. Preporučuje se oprezna upotreba pri korištenju ulja bosiljka.",
@@ -38,8 +38,8 @@ class TestS3 {
     }
 
     @Test
-    fun fixEpipactisHelleborine()= runBlocking {
-        var fixed = TrefleDAO().fixData(    Biljka(
+    fun fixEpipactisHelleborine() = runBlocking {
+        var fixed = TrefleDAO().fixData(Biljka(
             naziv = "Kruscika (Epipactis helleborine)",
             porodica = "Netacno (netacno)",
             medicinskoUpozorenje = "Može iritati kožu osjetljivu na sunce. Preporučuje se oprezna upotreba pri korištenju ulja bosiljka.",
@@ -60,15 +60,15 @@ class TestS3 {
     }
 
     @Test
-    fun getFlowerRosaPurple()= runBlocking {
+    fun getFlowerRosaPurple() = runBlocking {
         var plants = TrefleDAO().getPlantsWithFlowerColor("purple","rosa")
-        assertTrue("T3.1 - should contain \"Rosa pendulina\"",plants.find { biljka -> biljka.naziv.contains("Rosa pendulina",ignoreCase = true) }!=null)
+        assertTrue("T3.1 - should contain \"Rosa pendulina\"",plants.find { biljka -> biljka.naziv.contains("Rosa pendulina", ignoreCase = true) }!=null)
     }
 
     @Test
     fun getFlowerRampionBlue()= runBlocking {
         var plants = TrefleDAO().getPlantsWithFlowerColor("blue","rampion")
-        assertTrue("T4.1 - should contain \"Phyteuma spicatum\"",plants.find { biljka -> biljka.naziv.contains("Phyteuma spicatum",ignoreCase = true) }!=null)
+        assertTrue("T4.1 - should contain \"Phyteuma spicatum\"",plants.find { biljka -> biljka.naziv.contains("Phyteuma spicatum", ignoreCase = true) }!=null)
     }
 
 }
