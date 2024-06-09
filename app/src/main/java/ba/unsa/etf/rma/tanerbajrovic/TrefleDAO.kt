@@ -2,8 +2,10 @@ package ba.unsa.etf.rma.tanerbajrovic
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.util.Log
+import androidx.core.content.ContextCompat.getString
 import ba.unsa.etf.rma.tanerbajrovic.api.RetrofitClient
+import ba.unsa.etf.rma.tanerbajrovic.api.model.PlantResponse
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -23,7 +25,7 @@ class TrefleDAO : PlantDAO {
                 val response = RetrofitClient.trefleApiService.searchPlants(latinName)
                 val responseBody = response.body()
                 val plantBitmap = fetchPlantImage(responseBody!!.plants[0].imageURL) // Not good!! Need better error-handling.
-                return@withContext plantBitmap ?: defaultBitmap
+                return@withContext plantBitmap
             } catch (e: Exception) {
                 return@withContext defaultBitmap
             }
@@ -31,7 +33,7 @@ class TrefleDAO : PlantDAO {
     }
 
     /**
-     * Makes a request to download
+     * Downloads an image passed as URL.
      */
     private suspend fun fetchPlantImage(imageURL: String?): Bitmap {
         return withContext(Dispatchers.IO) {
@@ -49,11 +51,84 @@ class TrefleDAO : PlantDAO {
     }
 
     /**
-     * Validates data and repairs where needed.
+     * Validates data and repairs plant's data where needed.
      */
     override suspend fun fixData(plant: Biljka): Biljka {
-        // Search for the plant and
-        TODO()
+        return withContext(Dispatchers.IO) {
+            try {
+                // Obtaining the plant
+                val latinName = plant.getLatinName()
+                val response = RetrofitClient.trefleApiService.searchPlants(latinName)
+                val responseBody = response.body()
+                val plantResponse = RetrofitClient.trefleApiService.getPlantByID(responseBody!!.plants[0].id) // Fix this.
+                val plantResponseBody = plantResponse.body()
+                // Fixing the original plant
+                return@withContext fixPlantData(plant, plantResponseBody)
+            } catch (e: Exception) {
+                Log.e("Invalid data", e.toString())
+                return@withContext plant
+            }
+        }
+    }
+
+    private fun fixPlantData(plant: Biljka, plantResponseBody: PlantResponse?): Biljka {
+
+        if (plantResponseBody == null)
+            return plant
+
+        // Family
+        if (plantResponseBody.family != null && plant.porodica != plantResponseBody.family)
+            plant.porodica = plantResponseBody.family.toString()
+
+        // Dishes
+        if (plantResponseBody.mainSpecies.isEdible != null && plantResponseBody.mainSpecies.isEdible == false) {
+            plant.jela = listOf()
+            val notEdible: String = getString(context, R.string.not_edible)
+            if (!plant.medicinskoUpozorenje.contains(notEdible)) {
+                val sb = StringBuilder()
+                sb.append(plant.medicinskoUpozorenje)
+                if (sb.isNotEmpty())
+                    sb.append(" ")
+                sb.append(notEdible)
+                plant.medicinskoUpozorenje = sb.toString()
+            }
+        }
+
+        // Medical warning
+        if (plantResponseBody.mainSpecies.specifications.toxicity != null
+                && plantResponseBody.mainSpecies.specifications.toxicity != "none") {
+            plant.medicinskoUpozorenje
+            val toxic: String = getString(context, R.string.toxic)
+            if (!plant.medicinskoUpozorenje.contains(toxic)) {
+                val sb = StringBuilder()
+                sb.append(plant.medicinskoUpozorenje)
+                if (sb.isNotEmpty())
+                    sb.append(" ")
+                sb.append(toxic)
+                plant.medicinskoUpozorenje = sb.toString()
+            }
+        }
+
+        // Soil
+        if (plantResponseBody.mainSpecies.growth.soilTexture != null) { // What about adding new types?
+            val newSoilTypesList: List<Zemljiste> =
+                plant.zemljisniTipovi.filter {
+                    it != Zemljiste.getSoilType(plantResponseBody.mainSpecies.growth.soilTexture)
+                }
+            plant.zemljisniTipovi = newSoilTypesList
+        }
+
+        // Climate types
+        if (plantResponseBody.mainSpecies.growth.light != null
+            && plantResponseBody.mainSpecies.growth.atmosphericHumidity != null) { // What about adding new types?
+            val newClimateTypes: List<KlimatskiTip> =
+                plant.klimatskiTipovi.filter {
+                    it != KlimatskiTip.getClimateType(plantResponseBody.mainSpecies.growth.light,
+                        plantResponseBody.mainSpecies.growth.atmosphericHumidity)
+                }
+            plant.klimatskiTipovi = newClimateTypes
+        }
+        return plant
     }
 
     /**
@@ -65,14 +140,15 @@ class TrefleDAO : PlantDAO {
 
     /**
      * Sets the `Context` so that we can load the default `Bitmap`.
-     * ! Should we be using Glide for this?
      */
-
     fun setContext(context: Context) {
         this.context = context
         setDefaultBitmap()
     }
 
+    /**
+     * Sets the defaultBitmap from the app's resources.
+     */
     private fun setDefaultBitmap() {
         defaultBitmap = Glide.with(context)
             .asBitmap()
