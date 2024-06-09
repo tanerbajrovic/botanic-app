@@ -15,7 +15,7 @@
     <string name="invalid_text_input_message">Neispravan broj karaktera (2 – 40)</string>
     <string name="invalid_dish_duplicate_message">Uneseno jelo je već u listi.</string>
     <string name="invalid_number_of_dishes_message">Potrebno je unijeti bar jedno jelo.</string>
-    <string name="invalid_latin_plant_name">Neispravano latinsko ime biljke unutar ()</string>
+    <string name="invalid_latin_plant_name">Neispravano latinsko ime biljke unutar zagrada.</string>
     <string name="not_edible">NIJE JESTIVO></string>
     <string name="toxic">TOKSIČNO</string>
 </resources>
