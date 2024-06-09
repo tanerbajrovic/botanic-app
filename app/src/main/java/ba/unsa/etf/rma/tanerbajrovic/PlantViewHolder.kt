@@ -1,9 +1,15 @@
 package ba.unsa.etf.rma.tanerbajrovic
 
+import android.graphics.Bitmap
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -13,6 +19,21 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     open fun bind(plant: Biljka) {
         plantImage.setImageResource(R.mipmap.default_tree)
         plantName.text = plant.naziv
+        val scope = CoroutineScope(Dispatchers.IO)
+        scope.launch {
+            try {
+                val trefleDAO = TrefleDAO()
+                trefleDAO.setContext(itemView.context.applicationContext)
+                val bitmap: Bitmap = trefleDAO.getImage(plant)
+                withContext(Dispatchers.Main) {
+                    plantImage.setImageBitmap(bitmap)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Log.e("ExceptionError", e.toString())
+                }
+            }
+        }
     }
 
     class BotanicPlantViewHolder(itemView: View) : PlantViewHolder(itemView) {
