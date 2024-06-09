@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">SpiralApp</string>
     <string name="reset">Reset</string>
+    <string name="plant_name">Ime biljke</string>
+    <string name="quick_search">Brza pretraga</string>
     <string name="capture_plant">Uslikaj biljku</string>
     <string name="add_dish">Dodaj jelo</string>
     <string name="add_plant">Dodaj biljku</string>
