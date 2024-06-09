@@ -1,5 +1,8 @@
 package ba.unsa.etf.rma.tanerbajrovic
 
+import android.util.Log
+import com.google.gson.annotations.SerializedName
+
 class Biljka(
     val naziv: String,
     val porodica: String,
@@ -9,5 +12,14 @@ class Biljka(
     val jela: List<String>,
     val klimatskiTipovi: List<KlimatskiTip>,
     val zemljisniTipovi: List<Zemljiste>
-)
+) {
+
+    /**
+     * Returns the Latin name in parenthesis.
+     */
+    fun getLatinName(): String {
+        return naziv.substringAfter("(").substringBefore(")")
+    }
+
+}
 
