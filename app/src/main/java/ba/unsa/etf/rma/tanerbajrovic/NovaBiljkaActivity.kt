@@ -60,7 +60,8 @@ class NovaBiljkaActivity : AppCompatActivity() {
 
         fun doesContainLatinName(editText: EditText): Boolean {
             val text: String = editText.text.toString()
-            return text.substringAfter("(").substringBefore("(").isNotEmpty()
+            return text.contains("(") && text.contains(")")
+                    && text.substringAfter("(").substringBefore(")").isNotEmpty()
         }
 
         fun isValidDish(dish: EditText): Boolean {
@@ -169,28 +170,36 @@ class NovaBiljkaActivity : AppCompatActivity() {
      */
     private fun processPlantForm() {
 
-        var isInvalid= false
+        var isInvalid = false
         val invalidTextMessage = getString(R.string.invalid_text_input_message)
-        val invalidLatinName = getString(R.string.invalid_latin_plant_name)
+        val invalidLatinNameMessage = getString(R.string.invalid_latin_plant_name)
 
         if (!validator.isValidText(plantName)) {
             plantName.error = invalidTextMessage
             isInvalid = true
+        } else {
+            plantName.error = null
         }
 
         if (!validator.doesContainLatinName(plantName)) {
-            plantName.error = invalidLatinName
+            if (plantName.error == null)
+                plantName.error = invalidLatinNameMessage
             isInvalid = true
+            // Need to improve validation here. Use API.
         }
 
         if (!validator.isValidText(plantFamily)) {
             plantFamily.error = invalidTextMessage
             isInvalid = true
+        } else {
+            plantFamily.error = null
         }
 
         if (!validator.isValidText(plantWarning)) {
             plantWarning.error = invalidTextMessage
             isInvalid = true
+        } else {
+            plantWarning.error = null
         }
 
         if (!validator.isValidDishList()) {
