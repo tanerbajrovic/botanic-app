@@ -58,6 +58,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
             return (editText.text.length in 2..40)
         }
 
+        // TODO: Check if it's an actual Latin name via API.
         fun doesContainLatinName(editText: EditText): Boolean {
             val text: String = editText.text.toString()
             return text.contains("(") && text.contains(")")

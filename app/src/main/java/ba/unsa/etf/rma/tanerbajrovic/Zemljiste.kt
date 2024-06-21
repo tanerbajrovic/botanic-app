@@ -11,19 +11,21 @@ enum class Zemljiste(val naziv: String) {
     KRECNJACKO("Krečnjačko zemljište");
 
     companion object {
-        fun getSoilType(soilTexture: Int): Zemljiste {
+        fun getListOfSoilTypes(soilTexture: Int): List<Zemljiste> {
+            val soilTypes: MutableList<Zemljiste> = mutableListOf()
             if (soilTexture in 1..2)
-                return GLINENO
-            else if (soilTexture in 3..4)
-                return PJESKOVITO
-            else if (soilTexture in 5..6)
-                return ILOVACA
-            else if (soilTexture in 7..8)
-                return CRNICA
-            else if (soilTexture == 9)
-                return SLJUNKOVITO
-            else // soilTexture == 10
-                return KRECNJACKO
+                soilTypes.add(GLINENO)
+            if (soilTexture in 3..4)
+                soilTypes.add(PJESKOVITO)
+            if (soilTexture in 5..6)
+                soilTypes.add(ILOVACA)
+            if (soilTexture in 7..8)
+                soilTypes.add(CRNICA)
+            if (soilTexture == 9)
+                soilTypes.add(SLJUNKOVITO)
+            if (soilTexture == 10)
+                soilTypes.add(KRECNJACKO)
+            return soilTypes.toList()
         }
     }
 

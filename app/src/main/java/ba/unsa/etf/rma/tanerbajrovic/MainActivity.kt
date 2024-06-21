@@ -16,7 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -206,16 +209,19 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 // Fixing the incorrect values
-                val scope = CoroutineScope(Dispatchers.IO)
-                scope.launch {
-                    val trefleDAO = TrefleDAO()
-                    trefleDAO.setContext(applicationContext)
-                    newPlant = trefleDAO.fixData(newPlant)
+//                val scope = CoroutineScope(Job() + Dispatchers.IO)
+                GlobalScope.launch {
+                    withContext(Dispatchers.IO) {
+                        val trefleDAO = TrefleDAO()
+                        trefleDAO.setContext(applicationContext)
+                        newPlant = trefleDAO.fixData(newPlant)
+                        withContext(Dispatchers.Main) {
+                            listOfPlants.add(newPlant)
+                            plantsAdapter.updatePlants(listOfPlants)
+                            modeSpinner.setSelection(0)
+                        }
+                    }
                 }
-
-                listOfPlants.add(newPlant)
-                plantsAdapter.updatePlants(listOfPlants)
-                modeSpinner.setSelection(0)
             }
         }
     }

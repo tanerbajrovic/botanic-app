@@ -20,20 +20,26 @@ class TrefleDAO : PlantDAO {
      */
     override suspend fun getImage(plant: Biljka): Bitmap {
         return withContext(Dispatchers.IO) {
+            var plantBitmap: Bitmap = defaultBitmap
             try {
                 val latinName = plant.getLatinName()
                 val response = RetrofitClient.trefleApiService.searchPlants(latinName)
-                val responseBody = response.body()
-                val plantBitmap = fetchPlantImage(responseBody!!.plants[0].imageURL) // Not good!! Need better error-handling.
-                return@withContext plantBitmap
+                if (response.isSuccessful) {
+                    Log.d("GetImage", "Response successful.")
+                    val responseBody = response.body()
+                    plantBitmap = fetchPlantImage(responseBody!!.plants[0].imageURL)
+                } else {
+                    Log.d("GetImage", "Response failed.")
+                }
             } catch (e: Exception) {
-                return@withContext defaultBitmap
+                Log.e("GetImage", e.toString())
             }
+            return@withContext plantBitmap
         }
     }
 
     /**
-     * Downloads an image passed as URL.
+     * Downloads an image passed as URL. In case of any failure, returns `defaultBitmap`.
      */
     private suspend fun fetchPlantImage(imageURL: String?): Bitmap {
         return withContext(Dispatchers.IO) {
@@ -56,78 +62,91 @@ class TrefleDAO : PlantDAO {
     override suspend fun fixData(plant: Biljka): Biljka {
         return withContext(Dispatchers.IO) {
             try {
-                // Obtaining the plant
                 val latinName = plant.getLatinName()
-                val response = RetrofitClient.trefleApiService.searchPlants(latinName)
-                val responseBody = response.body()
-                val plantResponse = RetrofitClient.trefleApiService.getPlantByID(responseBody!!.plants[0].id) // Fix this.
-                val plantResponseBody = plantResponse.body()
-                // Fixing the original plant
-                return@withContext fixPlantData(plant, plantResponseBody)
+                val searchResponse = RetrofitClient.trefleApiService.searchPlants(latinName)
+                val searchResponseBody = searchResponse.body()
+                if (searchResponse.isSuccessful && searchResponseBody != null) {
+                    Log.d("FixData", "Search response successful and body not null.")
+                    Log.d("FixData", searchResponseBody.toString())
+                    if (searchResponseBody.plants.isNotEmpty()) {
+                        Log.d("FixData", "Search plants not empty.")
+                        val plantId = searchResponseBody.plants[0].id
+                        Log.d("FixData", "Plant id $plantId")
+                        val plantDetailResponse = RetrofitClient.trefleApiService.getPlantByID(plantId)
+                        val plantDetailResponseBody = plantDetailResponse.body()
+                        Log.d("FixData", plantDetailResponseBody.toString())
+                        if (plantDetailResponse.isSuccessful && plantDetailResponseBody != null) {
+                            Log.d("FixData", "Plant response successful and body not null.")
+                            Log.d("FixData", plantDetailResponseBody.toString())
+                            return@withContext fixPlantData(plant, plantDetailResponseBody.data)
+                        }
+                    }
+                }
             } catch (e: Exception) {
-                Log.e("Invalid data", e.toString())
-                return@withContext plant
+                Log.e("FixData", e.toString())
             }
+            return@withContext plant
         }
     }
 
-    private fun fixPlantData(plant: Biljka, plantResponseBody: PlantResponse?): Biljka {
+    private fun fixPlantData(plant: Biljka, plantResponseBody: PlantResponse): Biljka {
 
-        if (plantResponseBody == null)
-            return plant
+        Log.d("FixPlantData", "Started fixPlantData")
 
-        // Family
-        if (plantResponseBody.family != null && plant.porodica != plantResponseBody.family)
-            plant.porodica = plantResponseBody.family.toString()
+        if (plantResponseBody.mainSpecies != null) {
 
-        // Dishes
-        if (plantResponseBody.mainSpecies.isEdible != null && plantResponseBody.mainSpecies.isEdible == false) {
-            plant.jela = listOf()
-            val notEdible: String = getString(context, R.string.not_edible)
-            if (!plant.medicinskoUpozorenje.contains(notEdible)) {
-                val sb = StringBuilder()
-                sb.append(plant.medicinskoUpozorenje)
-                if (sb.isNotEmpty())
-                    sb.append(" ")
-                sb.append(notEdible)
-                plant.medicinskoUpozorenje = sb.toString()
+            // Family
+            if (plantResponseBody.mainSpecies.family != null && plant.porodica != plantResponseBody.mainSpecies.family) {
+                Log.d("FixPlantData", "Changing the family name")
+                plant.porodica = plantResponseBody.mainSpecies.family.toString()
             }
-        }
 
-        // Medical warning
-        if (plantResponseBody.mainSpecies.specifications.toxicity != null
-                && plantResponseBody.mainSpecies.specifications.toxicity != "none") {
-            plant.medicinskoUpozorenje
-            val toxic: String = getString(context, R.string.toxic)
-            if (!plant.medicinskoUpozorenje.contains(toxic)) {
-                val sb = StringBuilder()
-                sb.append(plant.medicinskoUpozorenje)
-                if (sb.isNotEmpty())
-                    sb.append(" ")
-                sb.append(toxic)
-                plant.medicinskoUpozorenje = sb.toString()
+            // Dishes
+            if (plantResponseBody.mainSpecies.isEdible != null && plantResponseBody.mainSpecies.isEdible == false) {
+                Log.d("FixPlantData", "Removing the dishes and adding \"NOT EDIBLE\"")
+                plant.jela = listOf()
+                val notEdibleDisclaimer: String = getString(context, R.string.not_edible_disclaimer)
+                if (!plant.medicinskoUpozorenje.contains(notEdibleDisclaimer))
+                    plant.addMedicalDisclaimer(notEdibleDisclaimer)
             }
-        }
 
-        // Soil
-        if (plantResponseBody.mainSpecies.growth.soilTexture != null) { // What about adding new types?
-            val newSoilTypesList: List<Zemljiste> =
-                plant.zemljisniTipovi.filter {
-                    it != Zemljiste.getSoilType(plantResponseBody.mainSpecies.growth.soilTexture)
+            // Medical warning
+            if (plantResponseBody.mainSpecies.specifications != null) {
+
+                if (plantResponseBody.mainSpecies.specifications.toxicity != null
+                    && plantResponseBody.mainSpecies.specifications.toxicity != "none") {
+                    Log.d("FixPlantData", "Adding medical warning")
+                    val toxicDisclaimer: String = getString(context, R.string.toxic_disclaimer)
+                    if (!plant.medicinskoUpozorenje.contains(toxicDisclaimer))
+                        plant.addMedicalDisclaimer(toxicDisclaimer)
                 }
-            plant.zemljisniTipovi = newSoilTypesList
-        }
 
-        // Climate types
-        if (plantResponseBody.mainSpecies.growth.light != null
-            && plantResponseBody.mainSpecies.growth.atmosphericHumidity != null) { // What about adding new types?
-            val newClimateTypes: List<KlimatskiTip> =
-                plant.klimatskiTipovi.filter {
-                    it != KlimatskiTip.getClimateType(plantResponseBody.mainSpecies.growth.light,
+            }
+
+            if (plantResponseBody.mainSpecies.growth != null) {
+
+                // Soil
+                // TODO: Add missing types
+                if (plantResponseBody.mainSpecies.growth.soilTexture != null) {
+                    Log.d("FixPlantData", "Fixing soil textures")
+                    val expectedSoilTypes: List<Zemljiste> = Zemljiste.getListOfSoilTypes(plantResponseBody.mainSpecies.growth.soilTexture)
+                    plant.zemljisniTipovi = expectedSoilTypes
+                }
+
+                // Climate types
+                // TODO: Add missing types
+                if (plantResponseBody.mainSpecies.growth.light != null
+                    && plantResponseBody.mainSpecies.growth.atmosphericHumidity != null) {
+                    Log.d("FixPlantData", "Fixing climate types")
+                    val expectedClimateTypes: List<KlimatskiTip> = KlimatskiTip.getListOfClimateTypes(plantResponseBody.mainSpecies.growth.light,
                         plantResponseBody.mainSpecies.growth.atmosphericHumidity)
+                    plant.klimatskiTipovi = expectedClimateTypes
                 }
-            plant.klimatskiTipovi = newClimateTypes
+
+            }
+
         }
+
         return plant
     }
 
@@ -155,7 +174,6 @@ class TrefleDAO : PlantDAO {
             .load(R.mipmap.default_tree)
             .submit()
             .get()
-
     }
 
 }

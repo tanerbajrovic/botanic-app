@@ -1,6 +1,7 @@
 package ba.unsa.etf.rma.tanerbajrovic.api
 
 import ba.unsa.etf.rma.tanerbajrovic.BuildConfig
+import ba.unsa.etf.rma.tanerbajrovic.api.model.PlantDetailResponse
 import ba.unsa.etf.rma.tanerbajrovic.api.model.PlantResponse
 import ba.unsa.etf.rma.tanerbajrovic.api.model.PlantSearchResponse
 import retrofit2.Response
@@ -21,6 +22,6 @@ interface TrefleAPI {
      * Returns a plant with the given `id`.
      */
     @GET("plants/{id}?token=${BuildConfig.TREFLE_API_KEY}")
-    suspend fun getPlantByID(@Path("id") id: Long): Response<PlantResponse>
+    suspend fun getPlantByID(@Path("id") id: Long): Response<PlantDetailResponse>
 
 }

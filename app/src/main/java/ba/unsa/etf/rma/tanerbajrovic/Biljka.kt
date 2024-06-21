@@ -1,8 +1,5 @@
 package ba.unsa.etf.rma.tanerbajrovic
 
-import android.util.Log
-import com.google.gson.annotations.SerializedName
-
 class Biljka(
     var naziv: String,
     var porodica: String,
@@ -19,6 +16,15 @@ class Biljka(
      */
     fun getLatinName(): String {
         return naziv.substringAfter("(").substringBefore(")")
+    }
+
+    fun addMedicalDisclaimer(disclaimerMessage: String) {
+        val sb = StringBuilder()
+        sb.append(this.medicinskoUpozorenje)
+        if (sb.isNotEmpty())
+            sb.append(" ")
+        sb.append(disclaimerMessage)
+        this.medicinskoUpozorenje = sb.toString()
     }
 
 }

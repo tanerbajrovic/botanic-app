@@ -7,6 +7,5 @@ data class PlantResponse(
     @SerializedName("common_name") val commonName: String?,
     @SerializedName("scientific_name") val scientificName: String?,
     @SerializedName("image_url") val imageURL: String?,
-    @SerializedName("family") val family: String?,
-    @SerializedName("main_species") val mainSpecies: MainSpeciesResponse
+    @SerializedName("main_species") val mainSpecies: MainSpeciesResponse?
 )
