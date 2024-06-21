@@ -16,6 +16,6 @@
     <string name="invalid_dish_duplicate_message">Uneseno jelo je već u listi.</string>
     <string name="invalid_number_of_dishes_message">Potrebno je unijeti bar jedno jelo.</string>
     <string name="invalid_latin_plant_name">Neispravano latinsko ime biljke unutar zagrada.</string>
-    <string name="not_edible">NIJE JESTIVO></string>
-    <string name="toxic">TOKSIČNO</string>
+    <string name="not_edible_disclaimer">NIJE JESTIVO</string>
+    <string name="toxic_disclaimer">TOKSIČNO</string>
 </resources>
