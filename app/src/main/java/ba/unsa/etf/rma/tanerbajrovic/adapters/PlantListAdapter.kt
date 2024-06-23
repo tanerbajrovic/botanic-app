@@ -1,17 +1,18 @@
-package ba.unsa.etf.rma.tanerbajrovic
+package ba.unsa.etf.rma.tanerbajrovic.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import ba.unsa.etf.rma.tanerbajrovic.R
+import ba.unsa.etf.rma.tanerbajrovic.models.Biljka
+import ba.unsa.etf.rma.tanerbajrovic.models.SpinnerState
 
 class PlantListAdapter(
     private var plants: List<Biljka>,
-    private var spinnerState: SpinnerState)
+    private var spinnerState: SpinnerState,
+    private val filterCriteria: (Biljka) -> Unit)
     : RecyclerView.Adapter<PlantViewHolder>() {
-
-    private var filteredPlants: List<Biljka> = plants.toList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlantViewHolder {
         lateinit var view: View
@@ -36,13 +37,13 @@ class PlantListAdapter(
     }
 
     override fun getItemCount(): Int {
-        return filteredPlants.size
+        return plants.size
     }
 
     override fun onBindViewHolder(holder: PlantViewHolder, position: Int) {
-        val item: Biljka = filteredPlants[position]
+        val item: Biljka = plants[position]
         holder.bind(item)
-        holder.itemView.setOnClickListener { filterPlants(item) }
+        holder.itemView.setOnClickListener { filterCriteria(item) }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -51,6 +52,11 @@ class PlantListAdapter(
             SpinnerState.BOTANIC -> R.layout.botanic_list_item
             SpinnerState.CULINARY -> R.layout.culinary_list_item
         }
+    }
+
+    override fun onViewRecycled(holder: PlantViewHolder) {
+        super.onViewRecycled(holder)
+        holder.clear()
     }
 
     fun changeSpinnerState(newState: SpinnerState) {
@@ -62,37 +68,6 @@ class PlantListAdapter(
 
     fun updatePlants(plants: List<Biljka>) {
         this.plants = plants.toList()
-        filteredPlants = plants.toList()
-        notifyDataSetChanged()
-    }
-
-    private fun filterPlants(plant: Biljka) {
-        when (spinnerState) {
-            SpinnerState.MEDICAL -> {
-                filteredPlants = filteredPlants.filter {
-                    it.medicinskeKoristi.intersect(plant.medicinskeKoristi.toSet()).isNotEmpty()
-                }
-            }
-            SpinnerState.BOTANIC -> {
-                filteredPlants = filteredPlants.filter {
-                    it.profilOkusa == plant.profilOkusa || it.jela.intersect(plant.jela.toSet()).isNotEmpty()
-                }
-            }
-            SpinnerState.CULINARY -> {
-                filteredPlants = filteredPlants.filter {
-                    it.porodica == plant.porodica
-                            &&
-                    it.klimatskiTipovi.intersect(plant.klimatskiTipovi.toSet()).isNotEmpty()
-                            &&
-                    it.zemljisniTipovi.intersect(plant.zemljisniTipovi.toSet()).isNotEmpty()
-                }
-            }
-        }
-        notifyDataSetChanged()
-    }
-
-    fun resetPlants() {
-        filteredPlants = plants.toList()
         notifyDataSetChanged()
     }
 

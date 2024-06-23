@@ -1,4 +1,10 @@
-package ba.unsa.etf.rma.tanerbajrovic
+package ba.unsa.etf.rma.tanerbajrovic.utils
+
+import ba.unsa.etf.rma.tanerbajrovic.models.Biljka
+import ba.unsa.etf.rma.tanerbajrovic.models.KlimatskiTip
+import ba.unsa.etf.rma.tanerbajrovic.models.MedicinskaKorist
+import ba.unsa.etf.rma.tanerbajrovic.models.ProfilOkusaBiljke
+import ba.unsa.etf.rma.tanerbajrovic.models.Zemljiste
 
 fun getPlants(): MutableList<Biljka> {
     return mutableListOf(
@@ -6,7 +12,8 @@ fun getPlants(): MutableList<Biljka> {
         naziv = "Bosiljak (Ocimum basilicum)",
         porodica = "Lamiaceae (usnate)",
         medicinskoUpozorenje = "Može iritati kožu osjetljivu na sunce. Preporučuje se oprezna upotreba pri korištenju ulja bosiljka.",
-        medicinskeKoristi = listOf(MedicinskaKorist.SMIRENJE,
+        medicinskeKoristi = listOf(
+            MedicinskaKorist.SMIRENJE,
             MedicinskaKorist.REGULACIJAPROBAVE),
         profilOkusa = ProfilOkusaBiljke.BEZUKUSNO,
         jela = listOf("Salata od paradajza", "Punjene tikvice"),
@@ -17,7 +24,8 @@ fun getPlants(): MutableList<Biljka> {
         naziv = "Nana (Mentha spicata)",
         porodica = "Lamiaceae (metvice)",
         medicinskoUpozorenje = "Nije preporučljivo za trudnice, dojilje i djecu mlađu od 3 godine.",
-        medicinskeKoristi = listOf(MedicinskaKorist.PROTUUPALNO,
+        medicinskeKoristi = listOf(
+            MedicinskaKorist.PROTUUPALNO,
             MedicinskaKorist.PROTIVBOLOVA),
         profilOkusa = ProfilOkusaBiljke.MENTA,
         jela = listOf("Jogurt sa voćem", "Gulaš"),
@@ -28,7 +36,8 @@ fun getPlants(): MutableList<Biljka> {
         naziv = "Kamilica (Matricaria chamomilla)",
         porodica = "Asteraceae (glavočike)",
         medicinskoUpozorenje = "Može uzrokovati alergijske reakcije kod osjetljivih osoba.",
-        medicinskeKoristi = listOf(MedicinskaKorist.SMIRENJE,
+        medicinskeKoristi = listOf(
+            MedicinskaKorist.SMIRENJE,
             MedicinskaKorist.PROTUUPALNO),
         profilOkusa = ProfilOkusaBiljke.AROMATICNO,
         jela = listOf("Čaj od kamilice"),
@@ -39,7 +48,8 @@ fun getPlants(): MutableList<Biljka> {
         naziv = "Ružmarin (Rosmarinus officinalis)",
         porodica = "Lamiaceae (metvice)",
         medicinskoUpozorenje = "Treba ga koristiti umjereno i konsultovati se sa ljekarom pri dugotrajnoj upotrebi ili upotrebi u većim količinama.",
-        medicinskeKoristi = listOf(MedicinskaKorist.PROTUUPALNO,
+        medicinskeKoristi = listOf(
+            MedicinskaKorist.PROTUUPALNO,
             MedicinskaKorist.REGULACIJAPRITISKA),
         profilOkusa = ProfilOkusaBiljke.AROMATICNO,
         jela = listOf("Pečeno pile", "Grah","Gulaš"),
@@ -50,7 +60,8 @@ fun getPlants(): MutableList<Biljka> {
         naziv = "Lavanda (Lavandula angustifolia)",
         porodica = "Lamiaceae (metvice)",
         medicinskoUpozorenje = "Nije preporučljivo za trudnice, dojilje i djecu mlađu od 3 godine. Također, treba izbjegavati kontakt lavanda ulja sa očima.",
-        medicinskeKoristi = listOf(MedicinskaKorist.SMIRENJE,
+        medicinskeKoristi = listOf(
+            MedicinskaKorist.SMIRENJE,
             MedicinskaKorist.PODRSKAIMUNITETU),
         profilOkusa = ProfilOkusaBiljke.AROMATICNO,
         jela = listOf("Jogurt sa voćem"),

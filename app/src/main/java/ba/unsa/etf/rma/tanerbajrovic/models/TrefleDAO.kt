@@ -1,11 +1,12 @@
-package ba.unsa.etf.rma.tanerbajrovic
+package ba.unsa.etf.rma.tanerbajrovic.models
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.core.content.ContextCompat.getString
+import ba.unsa.etf.rma.tanerbajrovic.R
 import ba.unsa.etf.rma.tanerbajrovic.api.RetrofitClient
-import ba.unsa.etf.rma.tanerbajrovic.api.model.PlantResponse
+import ba.unsa.etf.rma.tanerbajrovic.api.models.PlantResponse
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -91,8 +92,6 @@ class TrefleDAO : PlantDAO {
 
     private fun fixPlantData(plant: Biljka, plantResponseBody: PlantResponse): Biljka {
 
-        Log.d("FixPlantData", "Started fixPlantData")
-
         if (plantResponseBody.mainSpecies != null) {
 
             // Family
@@ -126,7 +125,6 @@ class TrefleDAO : PlantDAO {
             if (plantResponseBody.mainSpecies.growth != null) {
 
                 // Soil
-                // TODO: Add missing types
                 if (plantResponseBody.mainSpecies.growth.soilTexture != null) {
                     Log.d("FixPlantData", "Fixing soil textures")
                     val expectedSoilTypes: List<Zemljiste> = Zemljiste.getListOfSoilTypes(plantResponseBody.mainSpecies.growth.soilTexture)
@@ -134,7 +132,6 @@ class TrefleDAO : PlantDAO {
                 }
 
                 // Climate types
-                // TODO: Add missing types
                 if (plantResponseBody.mainSpecies.growth.light != null
                     && plantResponseBody.mainSpecies.growth.atmosphericHumidity != null) {
                     Log.d("FixPlantData", "Fixing climate types")
@@ -154,6 +151,43 @@ class TrefleDAO : PlantDAO {
      * Returns plants where the given flower condition is satisfied.
      */
     override suspend fun getPlantsWithFlowerColor(flowerColor: String, substring: String): List<Biljka> {
+//        return withContext(Dispatchers.IO) {
+            try {
+                val plantsFilterResponse = RetrofitClient.trefleApiService.filterPlantsByFlowerColor(flowerColor)
+                val plantsFilterResponseBody = plantsFilterResponse.body()
+                if (plantsFilterResponse.isSuccessful && plantsFilterResponseBody != null) {
+                    val plantsList: MutableList<Biljka> = mutableListOf()
+                    for (plantResponse: PlantResponse in plantsFilterResponseBody.plants) {
+                        val plant = getPlantFromPlantResponse(plantResponse)
+                        plantsList.add(plant)
+                    }
+                    return plantsList.toList()
+                }
+            } catch (e: Exception) {
+
+            }
+//        }
+        TODO()
+    }
+
+    /**
+     * Converts [PlantResponse] to [Biljka]. Values that are not avaialble
+     * are set to `null`.
+     */
+    private fun getPlantFromPlantResponse(plantResponse: PlantResponse): Biljka {
+//        if (plantResponse.mainSpecies != null) {
+//            val plant = Biljka(
+//                naziv = "${plantResponse.commonName} (${plantResponse.scientificName})",
+//                porodica = plantResponse.mainSpecies.family.toString(),
+//                medicinskoUpozorenje = "",
+//                medicinskeKoristi = listOf(),
+//                profilOkusa = ProfilOkusaBiljke.BEZUKUSNO,
+//                jela = listOf(),
+//                klimatskiTipovi = KlimatskiTip.getListOfClimateTypes(plantResponse.mainSpecies.growth.light,
+//                    plantResponse.mainSpecies.growth.atmosphericHumidity),
+//                zemljisniTipovi = listOf()
+//            )
+//        }
         TODO()
     }
 

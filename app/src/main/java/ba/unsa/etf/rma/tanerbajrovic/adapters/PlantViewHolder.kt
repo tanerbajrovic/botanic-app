@@ -1,4 +1,4 @@
-package ba.unsa.etf.rma.tanerbajrovic
+package ba.unsa.etf.rma.tanerbajrovic.adapters
 
 import android.graphics.Bitmap
 import android.util.Log
@@ -6,8 +6,13 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import ba.unsa.etf.rma.tanerbajrovic.R
+import ba.unsa.etf.rma.tanerbajrovic.models.TrefleDAO
+import ba.unsa.etf.rma.tanerbajrovic.models.Biljka
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -15,11 +20,12 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     private val plantImage: ImageView = itemView.findViewById(R.id.slikaItem)
     private val plantName: TextView = itemView.findViewById(R.id.nazivItem)
+    private lateinit var scope: CoroutineScope
 
     open fun bind(plant: Biljka) {
         plantImage.setImageResource(R.mipmap.default_tree)
         plantName.text = plant.naziv
-        val scope = CoroutineScope(Dispatchers.IO)
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         scope.launch {
             try {
                 val trefleDAO = TrefleDAO()
@@ -29,11 +35,13 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
                     plantImage.setImageBitmap(bitmap)
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Log.e("ExceptionError", e.toString())
-                }
+                Log.e("ExceptionError", e.toString())
             }
         }
+    }
+
+    fun clear() {
+        scope.cancel()
     }
 
     class BotanicPlantViewHolder(itemView: View) : PlantViewHolder(itemView) {

@@ -1,4 +1,4 @@
-package ba.unsa.etf.rma.tanerbajrovic
+package ba.unsa.etf.rma.tanerbajrovic.models
 
 enum class ProfilOkusaBiljke(val opis: String) {
 

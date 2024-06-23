@@ -19,6 +19,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import ba.unsa.etf.rma.tanerbajrovic.models.MedicinskaKorist
+import ba.unsa.etf.rma.tanerbajrovic.models.KlimatskiTip
+import ba.unsa.etf.rma.tanerbajrovic.models.ProfilOkusaBiljke
+import ba.unsa.etf.rma.tanerbajrovic.models.Zemljiste
 
 class NovaBiljkaActivity : AppCompatActivity() {
 

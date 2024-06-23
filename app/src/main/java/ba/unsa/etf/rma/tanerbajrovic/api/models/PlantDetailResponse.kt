@@ -1,4 +1,4 @@
-package ba.unsa.etf.rma.tanerbajrovic.api.model
+package ba.unsa.etf.rma.tanerbajrovic.api.models
 
 import com.google.gson.annotations.SerializedName
 

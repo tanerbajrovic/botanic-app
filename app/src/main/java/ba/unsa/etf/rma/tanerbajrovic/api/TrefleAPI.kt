@@ -1,9 +1,8 @@
 package ba.unsa.etf.rma.tanerbajrovic.api
 
 import ba.unsa.etf.rma.tanerbajrovic.BuildConfig
-import ba.unsa.etf.rma.tanerbajrovic.api.model.PlantDetailResponse
-import ba.unsa.etf.rma.tanerbajrovic.api.model.PlantResponse
-import ba.unsa.etf.rma.tanerbajrovic.api.model.PlantSearchResponse
+import ba.unsa.etf.rma.tanerbajrovic.api.models.PlantDetailResponse
+import ba.unsa.etf.rma.tanerbajrovic.api.models.PlantSearchResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -23,5 +22,8 @@ interface TrefleAPI {
      */
     @GET("plants/{id}?token=${BuildConfig.TREFLE_API_KEY}")
     suspend fun getPlantByID(@Path("id") id: Long): Response<PlantDetailResponse>
+
+    @GET("plants/?token=${BuildConfig.TREFLE_API_KEY}&filter[flower_color]={color}")
+    suspend fun filterPlantsByFlowerColor(@Path("color") flowerColor: String): Response<PlantSearchResponse>
 
 }

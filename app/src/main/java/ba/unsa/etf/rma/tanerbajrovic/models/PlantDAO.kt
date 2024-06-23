@@ -1,6 +1,7 @@
-package ba.unsa.etf.rma.tanerbajrovic
+package ba.unsa.etf.rma.tanerbajrovic.models
 
 import android.graphics.Bitmap
+import ba.unsa.etf.rma.tanerbajrovic.models.Biljka
 
 interface PlantDAO {
 
