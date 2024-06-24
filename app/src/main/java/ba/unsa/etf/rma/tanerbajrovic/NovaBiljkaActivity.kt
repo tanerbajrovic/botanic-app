@@ -59,7 +59,7 @@ class NovaBiljkaActivity : AppCompatActivity() {
     inner class Validator {
 
         fun isValidText(editText: EditText): Boolean {
-            return (editText.text.length in 2..40)
+            return (editText.text.length in 2..40) && editText.text.isNotBlank()
         }
 
         // TODO: Check if it's an actual Latin name via API.
