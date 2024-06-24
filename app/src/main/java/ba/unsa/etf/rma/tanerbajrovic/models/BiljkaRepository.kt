@@ -1,31 +1,56 @@
 package ba.unsa.etf.rma.tanerbajrovic.models
 
 import android.graphics.Bitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class BiljkaRepository(
-    private val biljkaDAO: BiljkaDAO
+    private val biljkaDAO: BiljkaDAO,
+    private val trefleDAO: TrefleDAO
 ) {
 
     // Database
 
     suspend fun saveBiljka(plant: Biljka): Boolean {
-        return biljkaDAO.saveBiljka(plant)
+        return withContext(Dispatchers.IO) {
+            biljkaDAO.saveBiljka(plant)
+        }
     }
 
     suspend fun insertBiljka(plant: Biljka) {
-        biljkaDAO.insertBiljka(plant)
+        return withContext(Dispatchers.IO) {
+            biljkaDAO.insertBiljka(plant)
+        }
+    }
+
+    suspend fun getBiljka(plantId: Long): Biljka? {
+        return withContext(Dispatchers.IO) {
+            biljkaDAO.getBiljka(plantId)
+        }
     }
 
     suspend fun getAllBiljkas(): List<Biljka> {
-        return biljkaDAO.getAllBiljkas()
+        return withContext(Dispatchers.IO) {
+            biljkaDAO.getAllBiljkas()
+        }
+    }
+
+    suspend fun addImage(plantId: Long, bitmap: Bitmap) {
+        return withContext(Dispatchers.IO) {
+            biljkaDAO.addImage(plantId, bitmap)
+        }
     }
 
     suspend fun clearBiljkas() {
-        biljkaDAO.clearBiljkas()
+        return withContext(Dispatchers.IO) {
+            biljkaDAO.clearBiljkas()
+        }
     }
 
     suspend fun clearBiljkaBitmaps() {
-        biljkaDAO.clearBiljkaBitmaps()
+        return withContext(Dispatchers.IO) {
+            biljkaDAO.clearBiljkaBitmaps()
+        }
     }
 
 //    suspend fun addImage(plantId: Long, bitmap: Bitmap) {
@@ -34,9 +59,11 @@ class BiljkaRepository(
 
     // API
 
-//    suspend fun getImage(plant: Biljka): Bitmap {
-//        return trefleDAO.getImage(plant)
-//    }
+    suspend fun getImage(plant: Biljka): Bitmap {
+        return withContext(Dispatchers.IO) {
+            trefleDAO.getImage(plant)
+        }
+    }
 //
 //    suspend fun fixPlantData(plant: Biljka): Biljka {
 //        return trefleDAO.fixData(plant)

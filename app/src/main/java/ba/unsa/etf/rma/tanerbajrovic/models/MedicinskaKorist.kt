@@ -9,4 +9,17 @@ enum class MedicinskaKorist(val opis: String) {
     REGULACIJAPROBAVE("Regulacija probave"),
     PODRSKAIMUNITETU("Podrška imunitetu");
 
+    companion object {
+
+        fun getMedicalRemedyFromDescription(description: String): MedicinskaKorist? {
+            for (value: MedicinskaKorist in MedicinskaKorist.entries) {
+                if (value.opis == description) {
+                    return value
+                }
+            }
+            return null
+        }
+
+    }
+
 }

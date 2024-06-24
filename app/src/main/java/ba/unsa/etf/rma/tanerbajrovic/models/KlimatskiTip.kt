@@ -10,6 +10,7 @@ enum class KlimatskiTip(val opis: String) {
     PLANINSKA("Planinska klima - hladne temperature i kratke sezone rasta");
 
     companion object {
+
         fun getListOfClimateTypes(light: Int, atmosphericHumidity: Int): List<KlimatskiTip> {
             val climateTypes: MutableList<KlimatskiTip> = mutableListOf()
             if (light in 7..9 && atmosphericHumidity in 1..2)
@@ -26,6 +27,16 @@ enum class KlimatskiTip(val opis: String) {
                 climateTypes.add(PLANINSKA)
             return climateTypes.toList()
         }
+
+        fun getClimateTypeFromDescription(description: String): KlimatskiTip? {
+            for (value: KlimatskiTip in KlimatskiTip.entries) {
+                if (value.opis == description) {
+                    return value
+                }
+            }
+            return null
+        }
+
     }
 
 }

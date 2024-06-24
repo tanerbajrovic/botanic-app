@@ -11,4 +11,17 @@ enum class ProfilOkusaBiljke(val opis: String) {
     AROMATICNO("Začinski - topli i aromatičan ukus"),
     GORKO("Gorak okus");
 
+    companion object {
+
+        fun getTasteProfileFromDescription(description: String): ProfilOkusaBiljke? {
+            for (value: ProfilOkusaBiljke in ProfilOkusaBiljke.entries) {
+                if (value.opis == description) {
+                    return value
+                }
+            }
+            return null
+        }
+
+    }
+
 }

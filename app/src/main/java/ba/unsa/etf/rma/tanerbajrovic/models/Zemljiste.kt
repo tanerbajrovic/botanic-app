@@ -27,6 +27,17 @@ enum class Zemljiste(val naziv: String) {
                 soilTypes.add(KRECNJACKO)
             return soilTypes.toList()
         }
+
+        fun getSoilTypeFromDescription(description: String): Zemljiste? {
+            for (value: Zemljiste in Zemljiste.entries) {
+                if (value.naziv == description) {
+                    return value
+                }
+            }
+            return null
+        }
+
+
     }
 
 }

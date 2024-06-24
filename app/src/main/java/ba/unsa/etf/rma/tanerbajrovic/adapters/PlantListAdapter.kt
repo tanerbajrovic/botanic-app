@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.tanerbajrovic.adapters
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import ba.unsa.etf.rma.tanerbajrovic.models.SpinnerState
 class PlantListAdapter(
     private var plants: List<Biljka>,
     private var spinnerState: SpinnerState,
+//    private val listener: (Biljka) -> Bitmap,
     private val filterCriteria: (Biljka) -> Unit)
     : RecyclerView.Adapter<PlantViewHolder>() {
 

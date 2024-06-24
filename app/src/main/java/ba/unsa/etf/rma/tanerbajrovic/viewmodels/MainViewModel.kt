@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    var plants: MutableList<Biljka> = getPlants()
-    var filteredPlants: List<Biljka> = plants.toList()
+    var plants: MutableList<Biljka> = mutableListOf()
+    var filteredPlants: List<Biljka> = mutableListOf()
     var spinnerState: SpinnerState = SpinnerState.MEDICAL
     val modes: Array<String> = arrayOf(
         SpinnerState.MEDICAL.description,

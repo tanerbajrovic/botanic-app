@@ -3,7 +3,6 @@ package ba.unsa.etf.rma.tanerbajrovic.viewmodels
 import android.app.Application
 import android.content.Intent
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import ba.unsa.etf.rma.tanerbajrovic.models.Biljka
@@ -14,10 +13,9 @@ import ba.unsa.etf.rma.tanerbajrovic.models.MedicinskaKorist
 import ba.unsa.etf.rma.tanerbajrovic.models.ProfilOkusaBiljke
 import ba.unsa.etf.rma.tanerbajrovic.models.TrefleDAO
 import ba.unsa.etf.rma.tanerbajrovic.models.Zemljiste
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 class BiljkaViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -26,13 +24,19 @@ class BiljkaViewModel(application: Application) : AndroidViewModel(application) 
 
     init {
         val biljkaDAO = BiljkaDatabase.getDatabase(application).biljkaDAO()
-        repository = BiljkaRepository(biljkaDAO)
-//        trefleDAO.setContext(application.applicationContext)
+        trefleDAO.setContext(application.applicationContext)
+        repository = BiljkaRepository(biljkaDAO, trefleDAO)
     }
 
     fun saveBiljka(plant: Biljka) {
         viewModelScope.launch {
             repository.saveBiljka(plant)
+        }
+    }
+
+    fun insertImage(plantId: Long, bitmap: Bitmap) {
+        viewModelScope.launch {
+            repository.addImage(plantId, bitmap)
         }
     }
 
@@ -42,28 +46,45 @@ class BiljkaViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun getAllBiljkas(): List<Biljka> {
+    fun getBiljka(plantId: Long): Biljka? {
         return runBlocking {
-            repository.getAllBiljkas()
+            repository.getBiljka(plantId)
         }
     }
 
-//
-//    fun getImage(plant: Biljka): Bitmap {
-//        return runBlocking {
-//            withContext(Dispatchers.IO) {
-//                repository.getImage(plant)
-//            }
-//        }
-//    }
-//
-//    fun fixPlantData(plant: Biljka): Biljka {
-//        return runBlocking {
-//            withContext(Dispatchers.IO) {
-//                trefleDAO.fixData(plant)
-//            }
-//        }
-//    }
+    fun getAllBiljkas(): List<Biljka> {
+        val deferredList = viewModelScope.async {
+            repository.getAllBiljkas()
+        }
+        return runBlocking {
+            deferredList.await()
+        }
+    }
+
+    fun getImage(plant: Biljka): Bitmap {
+        val deferredBitmap = viewModelScope.async {
+            repository.getImage(plant)
+        }
+        return runBlocking {
+            deferredBitmap.await()
+        }
+    }
+
+    fun fixPlantData(plant: Biljka): Biljka {
+        val deferredPlant = viewModelScope.async {
+            trefleDAO.fixData(plant)
+        }
+        return runBlocking {
+            deferredPlant.await()
+        }
+    }
+
+    fun populateDatabaseWithPlants(plants: List<Biljka>) {
+        viewModelScope.launch {
+            for (plant in plants)
+                insertBiljka(plant)
+        }
+    }
 
     fun getPlantFromIntentData(data: Intent): Biljka {
 
@@ -79,23 +100,17 @@ class BiljkaViewModel(application: Application) : AndroidViewModel(application) 
         // Converting Strings to respective Enums
         val medicalRemedies: MutableList<MedicinskaKorist> = mutableListOf()
         for (remedy: String in plantRemedies!!) {
-            MedicinskaKorist.entries.find {
-                it.opis == remedy
-            }.let { medicalRemedies.add(it!!) }
+            medicalRemedies.add(MedicinskaKorist.getMedicalRemedyFromDescription(remedy)!!)
         }
 
         val climateTypes: MutableList<KlimatskiTip> = mutableListOf()
         for (climate: String in plantClimateTypes!!) {
-            KlimatskiTip.entries.find {
-                it.opis == climate
-            }.let { climateTypes.add(it!!) }
+            climateTypes.add(KlimatskiTip.getClimateTypeFromDescription(climate)!!)
         }
 
         val soilTypes: MutableList<Zemljiste> = mutableListOf()
         for (soil: String in plantSoilTypes!!) {
-            Zemljiste.entries.find {
-                it.naziv == soil
-            }.let { soilTypes.add(it!!) }
+            soilTypes.add(Zemljiste.getSoilTypeFromDescription(soil)!!)
         }
 
         return Biljka(
@@ -103,20 +118,12 @@ class BiljkaViewModel(application: Application) : AndroidViewModel(application) 
             plantFamily!!,
             plantWarning!!,
             medicalRemedies,
-            getTasteProfileFromString(tasteProfile!!)!!,
+            ProfilOkusaBiljke.getTasteProfileFromDescription(tasteProfile!!)!!,
             dishes!!.toList(),
             climateTypes,
             soilTypes
         )
-    }
 
-    private fun getTasteProfileFromString(description: String): ProfilOkusaBiljke? {
-        for (value: ProfilOkusaBiljke in ProfilOkusaBiljke.entries) {
-            if (value.opis == description) {
-                return value
-            }
-        }
-        return null
     }
 
 }

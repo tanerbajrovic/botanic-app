@@ -3,6 +3,7 @@ package ba.unsa.etf.rma.tanerbajrovic.models
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.text.TextUtils
+import android.util.Log
 import androidx.room.TypeConverter
 import java.io.ByteArrayOutputStream
 

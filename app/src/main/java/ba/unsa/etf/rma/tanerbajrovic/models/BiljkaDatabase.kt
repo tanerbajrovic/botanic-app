@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 
 @Database(
     entities = [Biljka::class, BiljkaBitmap::class],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -34,7 +34,10 @@ abstract class BiljkaDatabase : RoomDatabase() {
                 context.applicationContext,
                 BiljkaDatabase::class.java,
                 "biljke-db"
-            ).build()
+            )
+            .createFromAsset("database/biljke-db-initial.db")
+            .fallbackToDestructiveMigration()
+            .build()
         }
 
     }

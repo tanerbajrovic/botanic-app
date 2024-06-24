@@ -2,6 +2,8 @@ package ba.unsa.etf.rma.tanerbajrovic
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.Global
@@ -12,14 +14,17 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ba.unsa.etf.rma.tanerbajrovic.models.MedicinskaKorist
 import ba.unsa.etf.rma.tanerbajrovic.adapters.PlantListAdapter
 import ba.unsa.etf.rma.tanerbajrovic.models.Biljka
+import ba.unsa.etf.rma.tanerbajrovic.models.BiljkaViewModelFactory
 import ba.unsa.etf.rma.tanerbajrovic.models.KlimatskiTip
 import ba.unsa.etf.rma.tanerbajrovic.models.ProfilOkusaBiljke
 import ba.unsa.etf.rma.tanerbajrovic.models.SpinnerState
@@ -43,7 +48,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var colorSpinner: Spinner
     private lateinit var colorSpinnerAdapter: ArrayAdapter<String>
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var biljkaViewModel: BiljkaViewModel
+    private val biljkaViewModel: BiljkaViewModel by viewModels {
+        BiljkaViewModelFactory(application)
+    }
 
     companion object {
         private const val NEW_PLANT_REQUEST_CODE = 3
@@ -53,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        biljkaViewModel = ViewModelProvider(this).get(BiljkaViewModel::class.java)
         val resetButton: Button = findViewById(R.id.resetBtn)
         val newPlantButton: Button = findViewById(R.id.novaBiljkaBtn)
         plants = findViewById(R.id.biljkeRV)
@@ -61,13 +67,13 @@ class MainActivity : AppCompatActivity() {
         quickSearchText = findViewById(R.id.pretragaET)
         quickSearchButton = findViewById(R.id.brzaPretraga)
         colorSpinner = findViewById(R.id.bojaSPIN)
+        populatePlantsFromDatabase()
         configureRecyclerView()
         configureModeSpinner()
         configureColorSpinner()
         resetButton.setOnClickListener {
             mainViewModel.resetPlants()
             plantsAdapter.updatePlants(mainViewModel.filteredPlants)
-            Log.d("FilteredPlants", mainViewModel.filteredPlants.toString())
         }
         quickSearchButton.setOnClickListener {
             TODO()
@@ -104,10 +110,12 @@ class MainActivity : AppCompatActivity() {
             LinearLayoutManager.VERTICAL,
             false
         )
+//        val listener: (Biljka) -> Bitmap = {
+//            plant -> biljkaViewModel.getImage(plant)
+//        }
         plantsAdapter = PlantListAdapter(mainViewModel.plants, mainViewModel.spinnerState) {
             mainViewModel.filterPlants(it)
             plantsAdapter.updatePlants(mainViewModel.filteredPlants)
-            Log.d("FilteredPlants", mainViewModel.filteredPlants.toString())
         }
         plants.adapter = plantsAdapter
         plantsAdapter.updatePlants(mainViewModel.filteredPlants)
@@ -167,26 +175,35 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, NEW_PLANT_REQUEST_CODE)
     }
 
+    private fun populatePlantsFromDatabase() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.IO) {
+                mainViewModel.plants = biljkaViewModel.getAllBiljkas().toMutableList()
+                mainViewModel.filteredPlants = mainViewModel.plants.toList()
+            }
+            plantsAdapter.updatePlants(mainViewModel.plants)
+        }
+    }
+
     @Deprecated("Deprecated in Java")
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == NEW_PLANT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+//            val bitmap = BitmapFactory.decodeResource(this.resources, R.drawable.default_tree_background)
             if (data != null) {
-                // Fixing the incorrect values
-                GlobalScope.launch {
+                lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
-                        val trefleDAO = TrefleDAO()
                         val newPlant = biljkaViewModel.getPlantFromIntentData(data)
-                        val fixedNewPlant = trefleDAO.fixData(newPlant)
+                        val fixedNewPlant = biljkaViewModel.fixPlantData(newPlant)
                         biljkaViewModel.insertBiljka(fixedNewPlant)
                         mainViewModel.plants.add(fixedNewPlant)
                         mainViewModel.spinnerState = SpinnerState.MEDICAL
-                       withContext(Dispatchers.Main) {
-                           plantsAdapter.updatePlants(mainViewModel.plants)
-                           plantsAdapter.changeSpinnerState(mainViewModel.spinnerState)
-                           modeSpinner.setSelection(0)
-                       }
+                        withContext(Dispatchers.Main) {
+                            plantsAdapter.updatePlants(mainViewModel.plants)
+                            plantsAdapter.changeSpinnerState(mainViewModel.spinnerState)
+                            modeSpinner.setSelection(0)
+                        }
                     }
                 }
             }
