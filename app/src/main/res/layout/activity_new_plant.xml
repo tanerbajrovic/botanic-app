@@ -79,7 +79,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toTopOf="@+id/uslikajBiljkuBtn"
-                    android:background="@drawable/default_tree_background"
+                    android:background="@drawable/default_tree"
                     android:contentDescription="Image of a plant"
                     android:scaleType="centerCrop"
                     />

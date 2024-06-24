@@ -205,7 +205,7 @@ class TrefleDAO : PlantDAO {
     private fun setDefaultBitmap() {
         defaultBitmap = Glide.with(context)
             .asBitmap()
-            .load(R.mipmap.default_tree)
+            .load(R.drawable.default_tree)
             .submit()
             .get()
     }

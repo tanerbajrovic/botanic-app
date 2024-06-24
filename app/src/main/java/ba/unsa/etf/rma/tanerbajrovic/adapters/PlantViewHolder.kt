@@ -23,8 +23,10 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     private lateinit var scope: CoroutineScope
 
     open fun bind(plant: Biljka) {
-        plantImage.setImageResource(R.mipmap.default_tree)
+        plantImage.setImageResource(R.drawable.default_tree)
         plantName.text = plant.naziv
+//        val bitmap: Bitmap = listener(plant)
+//        plantImage.setImageBitmap(bitmap)
         scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         scope.launch {
             try {
