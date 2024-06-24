@@ -54,8 +54,12 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             plantFamily.text = plant.porodica
             if (plant.zemljisniTipovi.isNotEmpty())
                 plantSoil.text = plant.zemljisniTipovi[0].naziv
+            else
+                plantSoil.text = ""
             if (plant.klimatskiTipovi.isNotEmpty())
                 plantClimate.text = plant.klimatskiTipovi[0].opis
+            else
+                plantClimate.text = ""
         }
     }
 
@@ -69,6 +73,11 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             super.bind(plant)
             plantTasteProfile.text = plant.profilOkusa.opis
             // Display at most three dishes (or display nothing when empty)
+            if (plant.jela.isEmpty()) {
+                plantDishOne.text = ""
+                plantDishTwo.text = ""
+                plantDishThree.text = ""
+            }
             for (i in 0 until minOf(plant.jela.size, 3)) {
                 when (i) {
                     0 -> plantDishOne.text = plant.jela[0]
@@ -88,6 +97,11 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         override fun bind(plant: Biljka) {
             super.bind(plant)
             plantWarning.text = plant.medicinskoUpozorenje
+            if (plant.medicinskeKoristi.isEmpty()) {
+                plantRemedyOne.text = ""
+                plantRemedyTwo.text = ""
+                plantRemedyThree.text = ""
+            }
             // Display at most three remedies (or display nothing when empty)
             for (i in 0 until minOf(plant.medicinskeKoristi.size, 3)) {
                 when (i) {
