@@ -27,7 +27,10 @@ interface BiljkaDAO {
         }
     }
 
-//    suspend fun fixOfflineBiljka(): Int
+//    @Transaction
+//    suspend fun fixOfflineBiljka(): Int {
+//        val uncheckedBiljkas = getAllUncheckedBiljkas()
+//    }
 
     @Transaction
     suspend fun addImage(plantId: Long, bitmap: Bitmap): Boolean {
@@ -51,6 +54,9 @@ interface BiljkaDAO {
     @Query("SELECT * FROM biljka")
     suspend fun getAllBiljkas(): List<Biljka>
 
+
+    @Query("SELECT * FROM biljka WHERE onlineChecked = false")
+    suspend fun getAllUncheckedBiljkas(): List<Biljka>
 
     /**
      * Clears contents of both tables.
