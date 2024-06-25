@@ -23,32 +23,26 @@ class BiljkaViewModel(application: Application) : AndroidViewModel(application) 
     private val trefleDAO = TrefleDAO()
 
     init {
-        val biljkaDAO = BiljkaDatabase.getDatabase(application).biljkaDAO()
+        val biljkaDAO = BiljkaDatabase.getDatabase(application).biljkaDao()
         trefleDAO.setContext(application.applicationContext)
         repository = BiljkaRepository(biljkaDAO, trefleDAO)
     }
 
-    fun saveBiljka(plant: Biljka) {
-        viewModelScope.launch {
+    fun saveBiljka(plant: Biljka): Boolean {
+        val deferredBoolean = viewModelScope.async {
             repository.saveBiljka(plant)
         }
+        return runBlocking {
+            deferredBoolean.await()
+        }
     }
 
-    fun insertImage(plantId: Long, bitmap: Bitmap) {
-        viewModelScope.launch {
+    fun addImage(plantId: Long, bitmap: Bitmap) : Boolean {
+        val deferredBoolean = viewModelScope.async {
             repository.addImage(plantId, bitmap)
         }
-    }
-
-    fun insertBiljka(plant: Biljka) {
         return runBlocking {
-            repository.insertBiljka(plant)
-        }
-    }
-
-    fun getBiljka(plantId: Long): Biljka? {
-        return runBlocking {
-            repository.getBiljka(plantId)
+            deferredBoolean.await()
         }
     }
 
@@ -61,9 +55,34 @@ class BiljkaViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun getBiljkaByName(name: String): Biljka? {
+        val deferredPlant = viewModelScope.async {
+            repository.getBiljkaByName(name)
+        }
+        return runBlocking {
+            deferredPlant.await()
+        }
+    }
+
+    fun getBiljka(plantId: Long): Biljka? {
+        val deferredPlant = viewModelScope.async {
+            repository.getBiljka(plantId)
+        }
+        return runBlocking {
+            deferredPlant.await()
+        }
+    }
+
+    // Firstly check the DB, then go to API.
     fun getImage(plant: Biljka): Bitmap {
         val deferredBitmap = viewModelScope.async {
-            repository.getImage(plant)
+            val actualPlant = repository.getBiljkaByName(plant.naziv)
+            var bitmap = repository.getBitmapByPlantId(actualPlant!!.id)
+            if (bitmap == null) {
+                bitmap = repository.getImage(plant)
+                repository.addImage(actualPlant.id, bitmap)
+            }
+            return@async bitmap
         }
         return runBlocking {
             deferredBitmap.await()
@@ -75,14 +94,9 @@ class BiljkaViewModel(application: Application) : AndroidViewModel(application) 
             trefleDAO.fixData(plant)
         }
         return runBlocking {
-            deferredPlant.await()
-        }
-    }
-
-    fun populateDatabaseWithPlants(plants: List<Biljka>) {
-        viewModelScope.launch {
-            for (plant in plants)
-                insertBiljka(plant)
+            val actualPlant = deferredPlant.await()
+            actualPlant.onlineChecked = true
+            return@runBlocking actualPlant
         }
     }
 

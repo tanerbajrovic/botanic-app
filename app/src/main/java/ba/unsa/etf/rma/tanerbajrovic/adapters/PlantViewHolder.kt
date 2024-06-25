@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import ba.unsa.etf.rma.tanerbajrovic.R
 import ba.unsa.etf.rma.tanerbajrovic.models.TrefleDAO
 import ba.unsa.etf.rma.tanerbajrovic.models.Biljka
+import ba.unsa.etf.rma.tanerbajrovic.models.BiljkaDatabase
+import ba.unsa.etf.rma.tanerbajrovic.viewmodels.BiljkaViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -25,8 +27,6 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     open fun bind(plant: Biljka) {
         plantImage.setImageResource(R.drawable.default_tree)
         plantName.text = plant.naziv
-//        val bitmap: Bitmap = listener(plant)
-//        plantImage.setImageBitmap(bitmap)
         scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         scope.launch {
             try {

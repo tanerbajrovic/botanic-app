@@ -15,10 +15,9 @@ import androidx.room.PrimaryKey
             parentColumns = ["id"],
             childColumns = ["idBiljke"],
             onDelete = ForeignKey.CASCADE
-        )
-    ])
+        )])
 data class BiljkaBitmap(
-    @ColumnInfo("bitmap") var bitmap: Bitmap,
+    @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo("idBiljke") var plantId: Long,
-    @PrimaryKey(autoGenerate = true) val id: Long = 0
+    @ColumnInfo("bitmap") var bitmap: Bitmap
 )

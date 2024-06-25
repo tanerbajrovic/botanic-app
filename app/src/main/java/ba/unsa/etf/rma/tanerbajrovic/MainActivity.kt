@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings.Global
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -21,19 +20,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ba.unsa.etf.rma.tanerbajrovic.models.MedicinskaKorist
 import ba.unsa.etf.rma.tanerbajrovic.adapters.PlantListAdapter
 import ba.unsa.etf.rma.tanerbajrovic.models.Biljka
 import ba.unsa.etf.rma.tanerbajrovic.models.BiljkaViewModelFactory
-import ba.unsa.etf.rma.tanerbajrovic.models.KlimatskiTip
-import ba.unsa.etf.rma.tanerbajrovic.models.ProfilOkusaBiljke
 import ba.unsa.etf.rma.tanerbajrovic.models.SpinnerState
-import ba.unsa.etf.rma.tanerbajrovic.models.TrefleDAO
-import ba.unsa.etf.rma.tanerbajrovic.models.Zemljiste
 import ba.unsa.etf.rma.tanerbajrovic.viewmodels.BiljkaViewModel
 import ba.unsa.etf.rma.tanerbajrovic.viewmodels.MainViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -110,8 +103,8 @@ class MainActivity : AppCompatActivity() {
             LinearLayoutManager.VERTICAL,
             false
         )
-//        val listener: (Biljka) -> Bitmap = {
-//            plant -> biljkaViewModel.getImage(plant)
+//        val plantImageListener: (Biljka) -> Bitmap = {
+//            biljkaViewModel.getImage(it)
 //        }
         plantsAdapter = PlantListAdapter(mainViewModel.plants, mainViewModel.spinnerState) {
             mainViewModel.filterPlants(it)
@@ -190,19 +183,29 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == NEW_PLANT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-//            val bitmap = BitmapFactory.decodeResource(this.resources, R.drawable.default_tree_background)
+            val bitmap = BitmapFactory.decodeResource(this.resources, R.drawable.default_tree)
+            if (bitmap == null)
+                Log.d("AddingPlants", "Bitmap is null")
             if (data != null) {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         val newPlant = biljkaViewModel.getPlantFromIntentData(data)
                         val fixedNewPlant = biljkaViewModel.fixPlantData(newPlant)
-                        biljkaViewModel.insertBiljka(fixedNewPlant)
-                        mainViewModel.plants.add(fixedNewPlant)
-                        mainViewModel.spinnerState = SpinnerState.MEDICAL
-                        withContext(Dispatchers.Main) {
-                            plantsAdapter.updatePlants(mainViewModel.plants)
-                            plantsAdapter.changeSpinnerState(mainViewModel.spinnerState)
-                            modeSpinner.setSelection(0)
+                        val isSaved = biljkaViewModel.saveBiljka(fixedNewPlant)
+                        val isSavedBitmap = biljkaViewModel.addImage(7, bitmap)
+                        if (isSavedBitmap)
+                            Log.d("AddingPlants", "Bitmap saved")
+                        if (isSaved) {
+                            Log.d("AddingPlants", "Correctly saved")
+                            populatePlantsFromDatabase()
+                            mainViewModel.spinnerState = SpinnerState.MEDICAL
+                            withContext(Dispatchers.Main) {
+                                plantsAdapter.updatePlants(mainViewModel.plants)
+                                plantsAdapter.changeSpinnerState(mainViewModel.spinnerState)
+                                modeSpinner.setSelection(0)
+                            }
+                        } else {
+                            Log.d("AddingPlants", "Wasn't saved")
                         }
                     }
                 }

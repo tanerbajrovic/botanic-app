@@ -17,7 +17,7 @@ class BiljkaRepository(
         }
     }
 
-    suspend fun insertBiljka(plant: Biljka) {
+    suspend fun insertBiljka(plant: Biljka): Long {
         return withContext(Dispatchers.IO) {
             biljkaDAO.insertBiljka(plant)
         }
@@ -29,15 +29,27 @@ class BiljkaRepository(
         }
     }
 
+    suspend fun getBiljkaByName(name: String): Biljka? {
+        return withContext(Dispatchers.IO) {
+            biljkaDAO.getBiljkaByName(name)
+        }
+    }
+
     suspend fun getAllBiljkas(): List<Biljka> {
         return withContext(Dispatchers.IO) {
             biljkaDAO.getAllBiljkas()
         }
     }
 
-    suspend fun addImage(plantId: Long, bitmap: Bitmap) {
+    suspend fun addImage(plantId: Long, bitmap: Bitmap): Boolean {
         return withContext(Dispatchers.IO) {
             biljkaDAO.addImage(plantId, bitmap)
+        }
+    }
+
+    suspend fun getBitmapByPlantId(plantId: Long): Bitmap? {
+        return withContext(Dispatchers.IO) {
+            biljkaDAO.getBitmapByBiljkaId(plantId)
         }
     }
 
