@@ -7,14 +7,14 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "biljka")
 class Biljka(
     @ColumnInfo(name = "naziv") var naziv: String,
-    @ColumnInfo(name = "porodica") var porodica: String,
-    @ColumnInfo(name = "medicinsko_upozorenje") var medicinskoUpozorenje: String,
-    @ColumnInfo(name = "medicinske_koristi") var medicinskeKoristi: List<MedicinskaKorist>,
-    @ColumnInfo(name = "profil_okusa") var profilOkusa: ProfilOkusaBiljke,
+    @ColumnInfo(name = "family") var porodica: String,
+    @ColumnInfo(name = "medicinskoUpozorenje") var medicinskoUpozorenje: String,
+    @ColumnInfo(name = "medicinskeKoristi") var medicinskeKoristi: List<MedicinskaKorist>,
+    @ColumnInfo(name = "profilOkusa") var profilOkusa: ProfilOkusaBiljke,
     @ColumnInfo(name = "jela") var jela: List<String>,
-    @ColumnInfo(name = "klimatski_tipovi") var klimatskiTipovi: List<KlimatskiTip>,
-    @ColumnInfo(name = "zemljisni_tipovi") var zemljisniTipovi: List<Zemljiste>,
-    @ColumnInfo(name = "online_checked") var onlineChecked: Boolean = false,
+    @ColumnInfo(name = "klimatskiTipovi") var klimatskiTipovi: List<KlimatskiTip>,
+    @ColumnInfo(name = "zemljisniTipovi") var zemljisniTipovi: List<Zemljiste>,
+    @ColumnInfo(name = "onlineChecked") var onlineChecked: Boolean = false,
     @PrimaryKey(autoGenerate = true) val id: Long = 0
 ) {
 
