@@ -32,9 +32,13 @@ interface BiljkaDAO {
     @Transaction
     suspend fun addImage(plantId: Long, bitmap: Bitmap): Boolean {
         try {
-            val biljkaBitmap = BiljkaBitmap(0, plantId, bitmap)
-            insertBiljkaBitmap(biljkaBitmap)
-            return true
+            val existingBitmap = getBitmapByBiljkaId(plantId)
+            if (existingBitmap == null) {
+                val biljkaBitmap = BiljkaBitmap(0, plantId, bitmap)
+                insertBiljkaBitmap(biljkaBitmap)
+                return true
+            }
+            return false
         } catch (e: Exception) {
             e.printStackTrace()
             return false
@@ -68,7 +72,7 @@ interface BiljkaDAO {
     @Query("SELECT * FROM biljka WHERE naziv = :name LIMIT 1")
     suspend fun getBiljkaByName(name: String): Biljka?
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBiljkaBitmap(biljkaBitmap: BiljkaBitmap): Long
 
     @Query("SELECT bitmap FROM biljkabitmap WHERE idBiljke = :plantId")

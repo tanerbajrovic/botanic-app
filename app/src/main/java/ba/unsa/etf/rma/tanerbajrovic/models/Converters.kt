@@ -64,9 +64,12 @@ class Converters {
 
     @TypeConverter
     fun fromBitmap(bitmap: Bitmap): String {
-        val resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, 1000, 1000)
+        var resizedBitmap: Bitmap = bitmap
+        if (bitmap.height > 400 || bitmap.width > 400) {
+            resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, 400, 400)
+        }
         val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        resizedBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
         val baseEncodedString = Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT)
         return baseEncodedString
     }

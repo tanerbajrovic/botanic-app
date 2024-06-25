@@ -100,9 +100,6 @@ class MainActivity : AppCompatActivity() {
             LinearLayoutManager.VERTICAL,
             false
         )
-//        val plantImageListener: (Biljka) -> Bitmap = {
-//            biljkaViewModel.getImage(it)
-//        }
         plantsAdapter = PlantListAdapter(mainViewModel.plants, mainViewModel.spinnerState) {
             mainViewModel.filterPlants(it)
             plantsAdapter.updatePlants(mainViewModel.filteredPlants)

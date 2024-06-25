@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import ba.unsa.etf.rma.tanerbajrovic.R
 import ba.unsa.etf.rma.tanerbajrovic.models.TrefleDAO
 import ba.unsa.etf.rma.tanerbajrovic.models.Biljka
+import ba.unsa.etf.rma.tanerbajrovic.models.BiljkaDAO
 import ba.unsa.etf.rma.tanerbajrovic.models.BiljkaDatabase
-import ba.unsa.etf.rma.tanerbajrovic.viewmodels.BiljkaViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -22,6 +22,8 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     private val plantImage: ImageView = itemView.findViewById(R.id.slikaItem)
     private val plantName: TextView = itemView.findViewById(R.id.nazivItem)
+    private val biljkaDao: BiljkaDAO = BiljkaDatabase.getDatabase(itemView.context.applicationContext).biljkaDao()
+    private val trefleDAO = TrefleDAO()
     private lateinit var scope: CoroutineScope
 
     open fun bind(plant: Biljka) {
@@ -30,11 +32,26 @@ sealed class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         scope.launch {
             try {
-                val trefleDAO = TrefleDAO()
                 trefleDAO.setContext(itemView.context.applicationContext)
-                val bitmap: Bitmap = trefleDAO.getImage(plant)
-                withContext(Dispatchers.Main) {
-                    plantImage.setImageBitmap(bitmap)
+                val actualPlant = biljkaDao.getBiljkaByName(plant.naziv)
+                val actualBitmap = biljkaDao.getBitmapByBiljkaId(actualPlant!!.id)
+                if (actualBitmap == null) {
+                    Log.d("PlantViewHolder", "${actualPlant.naziv} (${actualPlant.id}) has no bitmap in DB")
+                    val bitmap: Bitmap = trefleDAO.getImage(plant)
+                    val isSuccessful = biljkaDao.addImage(actualPlant.id, bitmap)
+                    if (isSuccessful) {
+                        Log.d("PlantViewHolder", "Added bitmap to DB")
+                    } else {
+                        Log.d("PlantViewHolder", "Didn't add bitmap")
+                    }
+                    withContext(Dispatchers.Main) {
+                        plantImage.setImageBitmap(bitmap)
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Log.d("PlantViewHolder", "Loaded bitmap from DB")
+                        plantImage.setImageBitmap(actualBitmap)
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("ExceptionError", e.toString())
