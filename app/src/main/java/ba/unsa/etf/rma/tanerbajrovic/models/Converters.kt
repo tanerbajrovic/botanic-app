@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.text.TextUtils
 import android.util.Base64
+import android.util.Log
 import androidx.room.TypeConverter
 import java.io.ByteArrayOutputStream
 
@@ -63,6 +64,7 @@ class Converters {
 
     @TypeConverter
     fun fromBitmap(bitmap: Bitmap): String {
+        val resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, 1000, 1000)
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
         val baseEncodedString = Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT)

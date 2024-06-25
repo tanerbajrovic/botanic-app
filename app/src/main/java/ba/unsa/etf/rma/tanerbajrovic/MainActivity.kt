@@ -2,8 +2,6 @@ package ba.unsa.etf.rma.tanerbajrovic
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -21,7 +19,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ba.unsa.etf.rma.tanerbajrovic.adapters.PlantListAdapter
-import ba.unsa.etf.rma.tanerbajrovic.models.Biljka
 import ba.unsa.etf.rma.tanerbajrovic.models.BiljkaViewModelFactory
 import ba.unsa.etf.rma.tanerbajrovic.models.SpinnerState
 import ba.unsa.etf.rma.tanerbajrovic.viewmodels.BiljkaViewModel
@@ -183,19 +180,13 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == NEW_PLANT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val bitmap = BitmapFactory.decodeResource(this.resources, R.drawable.default_tree)
-            if (bitmap == null)
-                Log.d("AddingPlants", "Bitmap is null")
             if (data != null) {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         val newPlant = biljkaViewModel.getPlantFromIntentData(data)
                         val fixedNewPlant = biljkaViewModel.fixPlantData(newPlant)
-                        val isSaved = biljkaViewModel.saveBiljka(fixedNewPlant)
-                        val isSavedBitmap = biljkaViewModel.addImage(7, bitmap)
-                        if (isSavedBitmap)
-                            Log.d("AddingPlants", "Bitmap saved")
-                        if (isSaved) {
+                        val isSavedPlant = biljkaViewModel.saveBiljka(fixedNewPlant)
+                        if (isSavedPlant) {
                             Log.d("AddingPlants", "Correctly saved")
                             populatePlantsFromDatabase()
                             mainViewModel.spinnerState = SpinnerState.MEDICAL
